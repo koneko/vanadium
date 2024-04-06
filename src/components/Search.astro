@@ -1,0 +1,55 @@
+---
+import MagnifyingGlass from "@astropub/icons/MagnifyingGlass";
+---
+
+<style>
+	div {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+	input {
+		width: 100%;
+		padding: 0.5rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 0.25rem;
+	}
+	button {
+		border: none;
+		border-radius: 0.25rem;
+		background-color: var(--header-bg);
+		color: var(--accent);
+		cursor: pointer;
+		font-size: 1rem;
+	}
+
+	button:hover {
+		background-color: var(--accent);
+		color: var(--header-bg);
+	}
+</style>
+
+<div class="search">
+	<input type="text" placeholder="Search..." id="search" />
+	<button>
+		<MagnifyingGlass size="32" />
+	</button>
+</div>
+<script>
+	const searchInput = document.getElementById("search") as HTMLInputElement;
+	const searchParams = new URLSearchParams(window.location.search);
+	const searchButton = document.querySelector(".search button") as HTMLButtonElement;
+	searchButton.addEventListener("click", () => {
+		const query = searchInput.value;
+		if (query) {
+			window.location.href = `/search?q=${query}`;
+		}
+	});
+	searchInput.addEventListener("keyup", (event) => {
+		if (event.key === "Enter") {
+			searchButton.click();
+		}
+	});
+	if (searchParams.get("q")) searchInput.value = searchParams.get("q");
+</script>

@@ -1,0 +1,5 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout name={Astro.url.searchParams.get("q") ? Astro.url.searchParams.get("q") : "Search"} />

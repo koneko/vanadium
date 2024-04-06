@@ -1,0 +1,20 @@
+<style>
+	.container {
+		width: 75%;
+		display: grid;
+		/* grid-template-columns: repeat(auto-fill, minmax(333px, 1fr)); */
+		/* max of 333px per element */
+		grid-template-columns: repeat(auto-fill, minmax(333px, 1fr));
+		grid-gap: 40px;
+	}
+	/* if phone, 1 col */
+	@media (max-width: 600px) {
+		.container {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<div class="container">
+	<slot />
+</div>
