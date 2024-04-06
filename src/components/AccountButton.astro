@@ -1,0 +1,43 @@
+---
+import Person from "@astropub/icons/Person";
+---
+
+<style>
+	div {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+	input {
+		width: 100%;
+		padding: 0.5rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 0.25rem;
+	}
+	button {
+		border: none;
+		border-radius: 0.25rem;
+		background-color: var(--header-bg);
+		color: var(--accent);
+		cursor: pointer;
+		font-size: 1rem;
+	}
+
+	button:hover {
+		background-color: var(--accent);
+		color: var(--header-bg);
+	}
+</style>
+
+<div class="account">
+	<button id="account-btn">
+		<Person size="32" />
+	</button>
+</div>
+<script>
+	const accountBtn = document.getElementById("account-btn");
+	accountBtn.addEventListener("click", () => {
+		window.location.href = "/account";
+	});
+</script>

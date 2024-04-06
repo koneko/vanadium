@@ -1,9 +1,9 @@
 ---
-import cfg from "../../../cfg.json";
 import Layout from "../../layouts/Layout.astro";
-import scraper from "../../../scraper.ts";
-let slug = Astro.params.slug;
+import scraper from "../../lib/scraper.ts";
+import CenteredContainer from "../../components/CenteredContainer.astro";
 
+let slug = Astro.params.slug;
 let title = slug.split("-episode")[0];
 let videos, url, data, image, number, trytitle;
 url = "/category/" + title;
@@ -26,6 +26,38 @@ if (videos.length == 0) {
 }
 ---
 
-<Layout name={slug}>
-	<span style="color:white">hello!</span>
+<Layout name={data.title}>
+	<CenteredContainer>
+		<div class="offset"></div>
+		<div class="content">
+			<div class="top-row">
+				<img src={image} style="width:90px;height:130px;" alt="Image of anime" />
+				<h1>{data.title} Episode {number}</h1>
+			</div>
+			<div class="video-container">
+				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" id="player-iframe" width="770px;" height="442px;" allowfullscreen="true"></iframe>
+			</div>
+			<div class="navigation"></div>
+			<div class="videos">
+				{
+					videos.map((video, index) => (
+						<button class="videos-btn" id={video}>
+							Server {index + 1}
+						</button>
+					))
+				}
+			</div>
+		</div>
+	</CenteredContainer>
 </Layout>
+
+<script>
+	let arr = document.getElementsByClassName("videos-btn") as any;
+	for (let i = 0; i < arr.length; i++) {
+		arr[i].addEventListener("click", function () {
+			let iframe = document.getElementById("main-video") as any;
+			iframe.src = arr[i].id;
+		});
+	}
+</script>
+../../lib/scraper.ts

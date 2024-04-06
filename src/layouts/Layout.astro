@@ -1,5 +1,6 @@
 ---
 import Search from "../components/Search.astro";
+import AccountButton from "../components/AccountButton.astro";
 ---
 
 <style is:global>
@@ -24,7 +25,7 @@ import Search from "../components/Search.astro";
 		min-height: calc(100vh - 4.21rem);
 		display: flex;
 		justify-content: center;
-		align-items: center;
+		/* align-items: center; */
 		background-color: #000000;
 	}
 	header {
@@ -47,6 +48,7 @@ import Search from "../components/Search.astro";
 	.right {
 		display: flex;
 		align-items: center;
+		gap: 5px;
 	}
 </style>
 
@@ -63,6 +65,7 @@ import Search from "../components/Search.astro";
 			</div>
 			<div class="right">
 				<Search />
+				<AccountButton />
 			</div>
 		</header>
 		<main>

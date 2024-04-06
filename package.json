@@ -11,10 +11,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/db": "^0.10.1",
     "@astrojs/node": "^8.2.5",
     "@astropub/icons": "^0.2.0",
     "astro": "^4.5.15",
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0-rc.12",
+    "crypto-es": "^2.1.0",
+    "mongoose": "^8.3.0"
   }
 }

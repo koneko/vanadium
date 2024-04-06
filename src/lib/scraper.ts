@@ -1,5 +1,8 @@
+// Description: This file contains the scraper for the gogoanime website.
+// You can write your own, just make sure to export the same functions  
+// as the ones in this file and to export the same object at the end.
 import { load } from "cheerio"
-import { url } from "./cfg.json"
+import { url } from "../../cfg.json"
 let base = url
 async function search (query) {
 	let url = base + "search.html?keyword=" + query
@@ -13,7 +16,6 @@ async function search (query) {
 		if (title == undefined) continue;
 		if (title == "") title = $(item).find('a').text()
 		title = title.replace(/"/g, "\"")
-
 		let image = $(item).find('img').attr('src')
 		let url = $(item).find('a').attr('href')
 		let obj = {
@@ -51,15 +53,13 @@ async function newEpisodes(page): Promise<any> {
 		let image = $(item).find('img').attr('src')
 		let url = $(item).find('a').attr('href')
 		let animeUrl = url.split("-episode-")[0]
-		// episode is p with class name episode
 		let episode = $(item).find('p.episode').text().split(" ")[1]
 		if (image[0] == "/") image = "https://gogoanime.tw" + image
-
 		let obj = {
 			title,
 			image,
 			url,
-			anime: "/category" + animeUrl,
+			anime: animeUrl,
 			episode
 		}
 		result.push(obj)
@@ -105,7 +105,6 @@ async function get (link) {
 	let genres = []
 	try {
 		let d = $("div.anime_info_body_bg").children("p.type").find("a[title]").toArray()
-		//remove first element from d
 		d.shift()
 		for (let i = 0; i < d.length; i++) {
 			genres.push(d[i].attribs.title)
@@ -114,19 +113,15 @@ async function get (link) {
 	} catch (e) {
 		genres = ["N/A"]
 	}
-	//get all numbers of videos
 	let num
 	try {
 		num = $(videos[videos.length - 1]).html().replace(/\s+/g, "").split("ep_end")[1].split(">")[0].replace(/"/g, "").replace("=", "")
-		// let num = $("div.anime_video_body").children("div.load_ep").children("ul#episode_related").children().length
-	} catch (e) {
+		} catch (e) {
 		num = 0
 	}
-
-	//compile all into obj
 	let obj = {
 		title,
-		alternative: altName,
+		aliases: altName,
 		image,
 		description,
 		episodes: num,
@@ -150,29 +145,10 @@ async function getSources (link) {
 	return result
 }
 
-async function getGenres () {
-	let raw = await fetch(base, { redirect: "follow" }).then((res) => res.text())
-	let $ = load(raw)
-	let result = []
-	let main = $('.genre').children().children().toArray()
-	for (let i = 0; i < main.length; i++) {
-		let item = main[i]
-		let title = $(item).find('a').attr('title')
-		let url = $(item).find('a').attr('href')
-		let obj = {
-			title,
-			url
-		}
-		result.push(obj)
-	}
-	return result
-}
-
 export default {
 	search,
 	get,
 	getSources,
-	getGenres,
 	newEpisodes,
 	getImage
 }

@@ -1,17 +1,16 @@
 ---
-import cfg from "../../cfg.json";
 import Layout from "../layouts/Layout.astro";
 import GridContainer from "../components/GridContainer.astro";
 import AnimeCard from "../components/AnimeCard.astro";
-import scraper from "../../scraper.ts";
+import scraper from "../lib/scraper.ts";
 
-let recentAnime: Array<{ title; image; anime; url; episode }> = (await scraper.newEpisodes(1)) || [];
+let recentAnime: Array<{ title; image; anime; url; episode }> = await scraper.newEpisodes(1);
 recentAnime = recentAnime.concat(await scraper.newEpisodes(2));
 ---
 
 <Layout name="New Episodes">
 	<GridContainer>
-		<!-- TODO: fix eye not centered -->
-		{recentAnime.map((anime) => <AnimeCard name={anime.title + " Episode " + anime.episode} src={anime.image} id={anime.anime} episode={anime.url} hasEye={true} />)}
+		{recentAnime.map((anime) => <AnimeCard name={anime.title + " Episode " + anime.episode} src={anime.image} id={anime.url} episode={anime.anime} hasEye={true} />)}
 	</GridContainer>
 </Layout>
+../lib/scraper.ts
