@@ -17,7 +17,7 @@ async function search (query) {
 		if (title == "") title = $(item).find('a').text()
 		title = title.replace(/"/g, "\"")
 		let image = $(item).find('img').attr('src')
-		let url = $(item).find('a').attr('href')
+		let url = $(item).find('a').attr('href').split("/category/")[1]
 		let obj = {
 			title,
 			image,
@@ -28,15 +28,7 @@ async function search (query) {
 	return result
 }
 
-async function getImage (link) {
-	let url = base + link
-	let raw = await fetch(url, { redirect: "follow" }).then((res) => res.text())
-	let $ = load(raw)
-	let image = $('div.anime_info_body').find('img').attr('src')
-	return image
-}
-
-async function newEpisodes(page): Promise<any> {
+async function newEpisodes (page) {
 	if (page == null) page = 1;
 	let url = `${base}?page=${page}&type=1`
 	let raw = await fetch(url, { redirect: "follow" }).then((res) => res.text())
@@ -53,13 +45,14 @@ async function newEpisodes(page): Promise<any> {
 		let image = $(item).find('img').attr('src')
 		let url = $(item).find('a').attr('href')
 		let animeUrl = url.split("-episode-")[0]
+		animeUrl = animeUrl.split("/")[1]
 		let episode = $(item).find('p.episode').text().split(" ")[1]
 		if (image[0] == "/") image = "https://gogoanime.tw" + image
 		let obj = {
 			title,
 			image,
-			url,
-			anime: animeUrl,
+			episodeUrl: url,
+			animeID: animeUrl,
 			episode
 		}
 		result.push(obj)
@@ -68,7 +61,7 @@ async function newEpisodes(page): Promise<any> {
 }
 
 async function get (link) {
-	let url = base + link
+	let url = base + "category/" + link
 	let raw = await fetch(url, { redirect: "follow" }).then((res) => res.text())
 	let $ = load(raw)
 	let videos = $('div.anime_video_body').children("#episode_page").children().toArray()
@@ -78,6 +71,7 @@ async function get (link) {
 	} catch (e) {
 		title = "N/A"
 	}
+	if (title == undefined) title = "N/A"
 	let image
 	try {
 		image = $("div.anime_info_body_bg").children("img").attr("src")
@@ -92,7 +86,7 @@ async function get (link) {
 	}
 	let date
 	try {
-		date = ($("div.anime_info_body_bg").children("p.type").find("span")["3"] as any).parentElement.textContent 
+		date = $("div.anime_info_body_bg").children("p.type").find("span")["3"].parentElement.textContent
 	} catch (e) {
 		date = "N/A"
 	}
@@ -102,6 +96,7 @@ async function get (link) {
 	} catch (e) {
 		altName = "N/A"
 	}
+	if (altName == undefined) altName = "N/A"
 	let genres = []
 	try {
 		let d = $("div.anime_info_body_bg").children("p.type").find("a[title]").toArray()
@@ -113,20 +108,22 @@ async function get (link) {
 	} catch (e) {
 		genres = ["N/A"]
 	}
+	genres = genres.join(", ")
 	let num
 	try {
 		num = $(videos[videos.length - 1]).html().replace(/\s+/g, "").split("ep_end")[1].split(">")[0].replace(/"/g, "").replace("=", "")
-		} catch (e) {
+	} catch (e) {
 		num = 0
 	}
 	let obj = {
-		title,
-		aliases: altName,
-		image,
-		description,
-		episodes: num,
-		date,
-		genres,
+		AnimeID: link,
+		Title: title,
+		Aliases: altName,
+		Image: image,
+		Description: description,
+		Episodes: num,
+		Date: date,
+		Genres: genres,
 	}
 	return obj
 }
@@ -149,6 +146,5 @@ export default {
 	search,
 	get,
 	getSources,
-	newEpisodes,
-	getImage
+	newEpisodes
 }

@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import scraper from "../../lib/scraper.ts";
+import scraper from "../../lib/scraper.js";
 import CenteredContainer from "../../components/CenteredContainer.astro";
 
 let slug = Astro.params.slug;
@@ -60,4 +60,3 @@ if (videos.length == 0) {
 		});
 	}
 </script>
-../../lib/scraper.ts

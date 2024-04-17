@@ -1,6 +1,5 @@
 {
-	"url": "https://gogoanime3.co",
-	"dbUrl": "mongodb://localhost:27017/vanadium-db",
-	"timeToWaitBetweenAnimeRefresh": 600,
-	"timeToWaitBetweenCacheRefresh": 120
+	"url": "https://gogoanime3.co/",
+	"timeToWaitBetweenAnimeRefresh": 1200,
+	"timeToWaitBetweenCacheRefresh": 600
 }

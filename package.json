@@ -2,7 +2,7 @@
   "name": "vanadium",
   "description": "NekoWatch, in space!",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -14,8 +14,9 @@
     "@astrojs/node": "^8.2.5",
     "@astropub/icons": "^0.2.0",
     "astro": "^4.5.15",
+    "better-sqlite3": "^9.5.0",
     "cheerio": "^1.0.0-rc.12",
     "crypto-es": "^2.1.0",
-    "mongoose": "^8.3.0"
+    "sqlite3": "^5.1.7"
   }
 }

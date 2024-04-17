@@ -1,5 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AnimeCard from "../components/AnimeCard.astro";
+import GridContainer from "../components/GridContainer.astro";
+import scraper from "../lib/scraper";
+let data = await scraper.search(Astro.url.searchParams.get("q") ? Astro.url.searchParams.get("q") : "N/A");
 ---
 
-<Layout name={Astro.url.searchParams.get("q") ? Astro.url.searchParams.get("q") : "Search"} />
+<Layout name={Astro.url.searchParams.get("q") ? Astro.url.searchParams.get("q") : "Search"}>
+	<GridContainer>
+		{data.map((anime) => <AnimeCard name={anime.title} src={anime.image} id={"/anime/" + anime.url} episode={"0"} hasEye={false} />)}
+	</GridContainer>
+</Layout>

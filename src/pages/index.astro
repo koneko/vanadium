@@ -2,15 +2,13 @@
 import Layout from "../layouts/Layout.astro";
 import GridContainer from "../components/GridContainer.astro";
 import AnimeCard from "../components/AnimeCard.astro";
-import scraper from "../lib/scraper.ts";
+import { newEpisodes } from "../lib/db.js";
 
-let recentAnime: Array<{ title; image; anime; url; episode }> = await scraper.newEpisodes(1);
-recentAnime = recentAnime.concat(await scraper.newEpisodes(2));
+let recentAnime = await newEpisodes();
 ---
 
 <Layout name="New Episodes">
 	<GridContainer>
-		{recentAnime.map((anime) => <AnimeCard name={anime.title + " Episode " + anime.episode} src={anime.image} id={anime.url} episode={anime.anime} hasEye={true} />)}
+		{recentAnime.map((anime) => <AnimeCard name={anime.Title + " Episode " + anime.Episode} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} />)}
 	</GridContainer>
 </Layout>
-../lib/scraper.ts
