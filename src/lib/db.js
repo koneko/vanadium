@@ -4,10 +4,37 @@ import scraper from "./scraper.js"
 const db = new Database("anime.db")
 db.pragma("journal_mode = WAL")
 
+async function getViewEntry (AnimeID) {
+	// 	url = "/category/" + title;
+	// videos = await scraper.getSources("/" + slug);
+	// data = await scraper.get(url);
+	// data.title = data.title.replace(/"/g, "");
+	// image = await scraper.getImage(url);
+	// number = slug.split("episode-")[1];
+	// if (videos.length == 0) {
+	// 	data = await scraper.get(url);
+	// 	image = await scraper.getImage(url);
+	// 	trytitle = data.title;
+	// 	//replace all spaces with -
+	// 	trytitle = trytitle.replace(/\s+/g, "-");
+	// 	//replace all uppercase with lowercase
+	// 	trytitle = trytitle.toLowerCase();
+	// 	trytitle = trytitle + "-episode-" + number;
+	// 	// console.log("trytitle " + trytitle)
+	// 	videos = await scraper.getSources("/" + trytitle);
+	// }
+}
+
+async function getAnimeEntry (AnimeID) {
+	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
+	updateAnimeEntry(AnimeID)
+	return db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
+}
+
 async function updateAnimeEntry (AnimeID) {
 	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
 	let shouldInsert = false
-	if (entry == undefined || (Date.now() - entry.LastUpdated) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh) {
+	if (entry == undefined) {
 		shouldInsert = true
 		entry = await scraper.get(AnimeID)
 	}
@@ -22,7 +49,8 @@ async function updateAnimeEntry (AnimeID) {
 	if (shouldInsert) {
 		db.prepare("INSERT INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 	} else {
-		db.prepare("UPDATE Anime SET Title = ?, Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(title, aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
+		if ((Date.now() - entry.LastUpdated) / 1000 <= cfg.timeToWaitBetweenAnimeRefresh)
+			db.prepare("UPDATE Anime SET Title = ?, Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(title, aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
 	}
 }
 
@@ -63,8 +91,12 @@ async function newEpisodes () {
 	}
 }
 
+async function searchFromDB (query) {
+	let results = db.prepare("SELECT * FROM Anime WHERE Title LIKE ? OR Aliases LIKE ?").all(`%${query}%`, `%${query}%`)
+	return results
+}
+
 async function search (query) {
-	// let results = db.prepare("SELECT * FROM Anime WHERE Title LIKE ? OR Aliases LIKE ?").all(`%${query}%`, `%${query}%`)
 	let results = await scraper.search(query)
 	results.forEach(item => {
 		updateAnimeEntry(item.AnimeID)
@@ -74,6 +106,8 @@ async function search (query) {
 
 export {
 	db,
+	search,
+	searchFromDB,
 	newEpisodes,
-	search
+	getAnimeEntry
 }
