@@ -19,9 +19,9 @@ async function search (query) {
 		let image = $(item).find('img').attr('src')
 		let url = $(item).find('a').attr('href').split("/category/")[1]
 		let obj = {
-			title,
-			image,
-			url
+			Title: title,
+			Image: image,
+			AnimeID: url
 		}
 		result.push(obj)
 	}

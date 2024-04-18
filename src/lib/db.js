@@ -6,7 +6,9 @@ db.pragma("journal_mode = WAL")
 
 async function updateAnimeEntry (AnimeID) {
 	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
-	if (entry == undefined) {
+	let shouldInsert = false
+	if (entry == undefined || (Date.now() - entry.LastUpdated) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh) {
+		shouldInsert = true
 		entry = await scraper.get(AnimeID)
 	}
 	const title = entry.Title
@@ -17,10 +19,10 @@ async function updateAnimeEntry (AnimeID) {
 	const date = entry.Date
 	const genres = entry.Genres
 	const lastUpdated = Date.now()
-	if (entry == undefined) {
+	if (shouldInsert) {
 		db.prepare("INSERT INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 	} else {
-		db.prepare("UPDATE Anime SET Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
+		db.prepare("UPDATE Anime SET Title = ?, Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(title, aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
 	}
 }
 
@@ -61,7 +63,17 @@ async function newEpisodes () {
 	}
 }
 
+async function search (query) {
+	// let results = db.prepare("SELECT * FROM Anime WHERE Title LIKE ? OR Aliases LIKE ?").all(`%${query}%`, `%${query}%`)
+	let results = await scraper.search(query)
+	results.forEach(item => {
+		updateAnimeEntry(item.AnimeID)
+	});
+	return results
+}
+
 export {
 	db,
-	newEpisodes
+	newEpisodes,
+	search
 }
