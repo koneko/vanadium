@@ -1,0 +1,34 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CenteredContainer from "../../components/CenteredContainer.astro";
+import { getAnimeEntry } from "../../lib/db.js";
+
+let AnimeID = Astro.params.slug;
+let Anime = await getAnimeEntry(AnimeID);
+if (!Anime) {
+	if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
+}
+---
+
+<style is:inline>
+	.container {
+		color: white;
+	}
+</style>
+
+<Layout name={Anime.Title}>
+	<CenteredContainer>
+		<div class="top">
+			<div class="left">
+				<img src={Anime.Image} alt={Anime.Title} />
+			</div>
+			<div class="right">
+				<h1>{Anime.Title}</h1>
+				<p>{Anime.Description}</p>
+			</div>
+		</div>
+		<div class="bottom">
+			<div class="episodes"></div>
+		</div>
+	</CenteredContainer>
+</Layout>

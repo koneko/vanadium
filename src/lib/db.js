@@ -4,30 +4,10 @@ import scraper from "./scraper.js"
 const db = new Database("anime.db")
 db.pragma("journal_mode = WAL")
 
-async function getViewEntry (AnimeID) {
-	// 	url = "/category/" + title;
-	// videos = await scraper.getSources("/" + slug);
-	// data = await scraper.get(url);
-	// data.title = data.title.replace(/"/g, "");
-	// image = await scraper.getImage(url);
-	// number = slug.split("episode-")[1];
-	// if (videos.length == 0) {
-	// 	data = await scraper.get(url);
-	// 	image = await scraper.getImage(url);
-	// 	trytitle = data.title;
-	// 	//replace all spaces with -
-	// 	trytitle = trytitle.replace(/\s+/g, "-");
-	// 	//replace all uppercase with lowercase
-	// 	trytitle = trytitle.toLowerCase();
-	// 	trytitle = trytitle + "-episode-" + number;
-	// 	// console.log("trytitle " + trytitle)
-	// 	videos = await scraper.getSources("/" + trytitle);
-	// }
-}
-
 async function getAnimeEntry (AnimeID) {
+	await updateAnimeEntry(AnimeID)
 	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
-	updateAnimeEntry(AnimeID)
+	if (entry == null) return null
 	return db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
 }
 
@@ -38,6 +18,7 @@ async function updateAnimeEntry (AnimeID) {
 		shouldInsert = true
 		entry = await scraper.get(AnimeID)
 	}
+	if (entry.Title == "Error 404") return null
 	const title = entry.Title
 	const aliases = entry.Aliases
 	const image = entry.Image
@@ -49,7 +30,7 @@ async function updateAnimeEntry (AnimeID) {
 	if (shouldInsert) {
 		db.prepare("INSERT INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 	} else {
-		if ((Date.now() - entry.LastUpdated) / 1000 <= cfg.timeToWaitBetweenAnimeRefresh)
+		if ((Date.now() - entry.LastUpdated) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh)
 			db.prepare("UPDATE Anime SET Title = ?, Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(title, aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
 	}
 }
