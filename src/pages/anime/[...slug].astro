@@ -8,7 +8,7 @@ let Anime = await getAnimeEntry(AnimeID);
 if (!Anime) {
 	if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
 }
-let isUserLoggedIn = true;
+let isUserLoggedIn = false;
 
 let episodeMapArr = [];
 for (let i = 0; i < Anime.Episodes; i++) {
@@ -20,49 +20,95 @@ for (let i = 0; i < Anime.Episodes; i++) {
 	.container {
 		color: white;
 	}
+</style>
+
+<style>
 	.top {
 		display: flex;
+		gap: 20px;
 	}
-	.right {
-		margin-left: 1rem;
-		flex-direction: column;
-		align-items: left;
+	.anime-right {
 		text-align: left;
-		justify-content: left;
+		width
+	}
+	.offset {
+		height: 4rem;
+	}
+	p {
+		margin: 0.5rem 0;
+	}
+	.episode {
+		padding: 0.5rem;
+		border-radius: 5px;
+		text-decoration: none;
+		background-color: var(--accent);
+		text-align:center
+	}
+	.episode:hover {
+		background-color: var(--accent-dark)
+	}
+	.episode a {
+		color: black;
+		text-decoration: none;
+		font-weight: bolder;
+	}
+	.episode:hover a {
+		color: var(--accent);
+	}
+	.episodes {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));	
+		gap: 20px;
+
 	}
 </style>
 
 <Layout name={Anime.Title}>
 	<CenteredContainer>
+		<div class="offset"></div>
 		<div class="top">
-			<div class="left">
+			<div class="anime-left">
 				<img src={Anime.Image} alt={Anime.Title} />
 			</div>
-			<div class="right">
+			<div class="anime-right">
 				<h1>{Anime.Title}</h1>
-				{Anime.Aliases != "N/A" && <p>{Anime.Aliases}</p>}
-				{Anime.Description != "N/A" && <p>{Anime.Description}</p>}
-				{!Anime.Genres.includes("N/A") && <p>{Anime.Genres}</p>}
+				{
+					Anime.Description != "N/A" && (
+						<p>
+							<b>Description: </b> {Anime.Description}
+						</p>
+					)
+				}
+				{
+					Anime.Aliases != "N/A" && (
+						<p>
+							<b>Aliases: </b> {Anime.Aliases}
+						</p>
+					)
+				}
+				{
+					!Anime.Genres.includes("N/A") && (
+						<p>
+							<b>Genres: </b> {Anime.Genres}
+						</p>
+					)
+				}
 				{
 					isUserLoggedIn && (
 						<div class="actions">
-							<button>Watch</button>
-							<button>Favorite</button>
-							<button>Rate</button>
+							<button>Add to List</button>
 						</div>
 					)
 				}
-			</div>
-		</div>
-		<div class="bottom">
-			<div class="episodes">
-				{
-					episodeMapArr.map((episode) => (
-						<div class="episode">
-							<a href={"/view/" + AnimeID + "-episode-" + episode}>Episode {episode}</a>
-						</div>
-					))
-				}
+				<div class="episodes">
+					{
+						episodeMapArr.map((episode) => (
+							<div class="episode">
+								<a href={"/view/" + AnimeID + "-episode-" + episode}>Episode {episode}</a>
+							</div>
+						))
+					}
+				</div>
 			</div>
 		</div>
 	</CenteredContainer>

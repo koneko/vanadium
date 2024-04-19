@@ -77,7 +77,7 @@ import AccountButton from "../components/AccountButton.astro";
 	<body>
 		<header>
 			<div class="left">
-				<h2>Vanadium</h2>
+				<h2><a href="/" style="color: var(--accent); text-decoration: none;">Vanadium</a></h2>
 			</div>
 			<div class="right">
 				<Search />
@@ -89,9 +89,3 @@ import AccountButton from "../components/AccountButton.astro";
 		</main>
 	</body>
 </html>
-
-<script>
-	document.querySelector("h2").addEventListener("click", () => {
-		location.href = "/";
-	});
-</script>

@@ -31,7 +31,7 @@ if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 				<h1>{data.title} Episode {number}</h1>
 			</div>
 			<div class="video-container">
-				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" id="player-iframe" width="770px;" height="442px;" allowfullscreen="true"></iframe>
+				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" width="770px;" height="442px;" allowfullscreen="true"></iframe>
 			</div>
 			<div class="navigation"></div>
 			<div class="videos">
