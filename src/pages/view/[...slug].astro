@@ -9,21 +9,17 @@ let videos, url, data, image, number, trytitle;
 url = "/category/" + title;
 videos = await scraper.getSources("/" + slug);
 data = await scraper.get(url);
-data.title = data.title.replace(/"/g, "");
-image = await scraper.getImage(url);
+data.Title = data.Title.replace(/"/g, "");
+image = data.Image;
 number = slug.split("episode-")[1];
 if (videos.length == 0) {
-	data = await scraper.get(url);
-	image = await scraper.getImage(url);
-	trytitle = data.title;
-	//replace all spaces with -
+	trytitle = data.Title;
 	trytitle = trytitle.replace(/\s+/g, "-");
-	//replace all uppercase with lowercase
 	trytitle = trytitle.toLowerCase();
 	trytitle = trytitle + "-episode-" + number;
-	// console.log("trytitle " + trytitle)
 	videos = await scraper.getSources("/" + trytitle);
 }
+if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 ---
 
 <Layout name={data.title}>

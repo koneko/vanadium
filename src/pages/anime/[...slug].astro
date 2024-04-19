@@ -8,11 +8,27 @@ let Anime = await getAnimeEntry(AnimeID);
 if (!Anime) {
 	if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
 }
+let isUserLoggedIn = true;
+
+let episodeMapArr = [];
+for (let i = 0; i < Anime.Episodes; i++) {
+	episodeMapArr.push(i + 1);
+}
 ---
 
 <style is:inline>
 	.container {
 		color: white;
+	}
+	.top {
+		display: flex;
+	}
+	.right {
+		margin-left: 1rem;
+		flex-direction: column;
+		align-items: left;
+		text-align: left;
+		justify-content: left;
 	}
 </style>
 
@@ -24,11 +40,30 @@ if (!Anime) {
 			</div>
 			<div class="right">
 				<h1>{Anime.Title}</h1>
-				<p>{Anime.Description}</p>
+				{Anime.Aliases != "N/A" && <p>{Anime.Aliases}</p>}
+				{Anime.Description != "N/A" && <p>{Anime.Description}</p>}
+				{!Anime.Genres.includes("N/A") && <p>{Anime.Genres}</p>}
+				{
+					isUserLoggedIn && (
+						<div class="actions">
+							<button>Watch</button>
+							<button>Favorite</button>
+							<button>Rate</button>
+						</div>
+					)
+				}
 			</div>
 		</div>
 		<div class="bottom">
-			<div class="episodes"></div>
+			<div class="episodes">
+				{
+					episodeMapArr.map((episode) => (
+						<div class="episode">
+							<a href={"/view/" + AnimeID + "-episode-" + episode}>Episode {episode}</a>
+						</div>
+					))
+				}
+			</div>
 		</div>
 	</CenteredContainer>
 </Layout>
