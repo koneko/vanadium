@@ -84,12 +84,10 @@ async function get (link) {
 	} catch (e) {
 		description = "N/A"
 	}
-	let date
-	try {
-		date = $("div.anime_info_body_bg").children("p.type").find("span")["3"].parentElement.textContent
-	} catch (e) {
-		date = "N/A"
-	}
+	let releaseDate = $('div.anime_info_body_bg > p:nth-child(8)')
+		.text()
+		.trim()
+		.split('Released: ')[1];
 	let altName;
 	try {
 		altName = $("div.anime_info_body_bg").children("p.other-name").find("a").attr("title")
@@ -122,7 +120,7 @@ async function get (link) {
 		Image: image,
 		Description: description,
 		Episodes: num,
-		Date: date,
+		Date: releaseDate,
 		Genres: genres,
 	}
 	return obj
@@ -145,6 +143,9 @@ async function getSources (link) {
 export default {
 	search,
 	get,
-	getSources,
 	newEpisodes
+}
+
+export {
+	getSources
 }

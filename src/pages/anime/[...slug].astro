@@ -5,9 +5,8 @@ import { getAnimeEntry } from "../../lib/db.js";
 
 let AnimeID = Astro.params.slug;
 let Anime = await getAnimeEntry(AnimeID);
-if (!Anime) {
-	if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
-}
+if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
+
 let isUserLoggedIn = false;
 
 let episodeMapArr = [];
@@ -29,7 +28,7 @@ for (let i = 0; i < Anime.Episodes; i++) {
 	}
 	.anime-right {
 		text-align: left;
-		width
+		width: 70%;
 	}
 	.offset {
 		height: 4rem;
@@ -42,10 +41,10 @@ for (let i = 0; i < Anime.Episodes; i++) {
 		border-radius: 5px;
 		text-decoration: none;
 		background-color: var(--accent);
-		text-align:center
+		text-align: center;
 	}
 	.episode:hover {
-		background-color: var(--accent-dark)
+		background-color: var(--accent-dark);
 	}
 	.episode a {
 		color: black;
@@ -57,9 +56,8 @@ for (let i = 0; i < Anime.Episodes; i++) {
 	}
 	.episodes {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));	
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 		gap: 20px;
-
 	}
 </style>
 
@@ -76,6 +74,13 @@ for (let i = 0; i < Anime.Episodes; i++) {
 					Anime.Description != "N/A" && (
 						<p>
 							<b>Description: </b> {Anime.Description}
+						</p>
+					)
+				}
+				{
+					Anime.Date != "N/A" && (
+						<p>
+							<b>Date: </b> {Anime.Date}
 						</p>
 					)
 				}

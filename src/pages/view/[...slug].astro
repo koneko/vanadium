@@ -1,15 +1,17 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import scraper from "../../lib/scraper.js";
 import CenteredContainer from "../../components/CenteredContainer.astro";
+import { ArrowLeft, ArrowRight } from "@astropub/icons";
+import { getSources } from "../../lib/scraper.js";
+import { getAnimeEntry } from "../../lib/db";
 
 let slug = Astro.params.slug;
 let title = slug.split("-episode")[0];
-let videos, url, data, image, number, trytitle;
-url = "/category/" + title;
-videos = await scraper.getSources("/" + slug);
-data = await scraper.get(url);
-data.Title = data.Title.replace(/"/g, "");
+let videos, data, image, number, trytitle;
+videos = await getSources("/" + slug);
+data = await getAnimeEntry(title);
+// data.Title = data.Title.replace(/"/g, "");
+console.log(data);
 image = data.Image;
 number = slug.split("episode-")[1];
 if (videos.length == 0) {
@@ -17,23 +19,87 @@ if (videos.length == 0) {
 	trytitle = trytitle.replace(/\s+/g, "-");
 	trytitle = trytitle.toLowerCase();
 	trytitle = trytitle + "-episode-" + number;
-	videos = await scraper.getSources("/" + trytitle);
+	videos = await getSources("/" + trytitle);
 }
 if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 ---
 
-<Layout name={data.title}>
+<style>
+	a {
+		border: none;
+		border-radius: 0.25rem;
+		background-color: var(--accent);
+		color: black;
+		cursor: pointer;
+		font-size: 1.5rem;
+		padding: 0.5rem 1rem;
+		font-weight: bolder;
+		text-decoration: none;
+		text-align: center;
+		align-items: center;
+		display: flex;
+	}
+	a:hover {
+		background-color: black;
+		color: var(--accent);
+	}
+	button {
+		border: none;
+		border-radius: 0.25rem;
+		background-color: var(--accent);
+		color: black;
+		cursor: pointer;
+		font-size: 1rem;
+		padding: 0.5rem 1rem;
+		font-weight: bolder;
+	}
+	button:hover {
+		background-color: black;
+		color: var(--accent);
+	}
+	.videos,
+	.video-container,
+	.navigation {
+		display: flex;
+		gap: 10px;
+		justify-content: center;
+	}
+	.navigation {
+		display: flex;
+		gap: 5px;
+	}
+</style>
+
+<Layout name={data.Title}>
 	<CenteredContainer>
 		<div class="offset"></div>
 		<div class="content">
 			<div class="top-row">
 				<img src={image} style="width:90px;height:130px;" alt="Image of anime" />
-				<h1>{data.title} Episode {number}</h1>
+				<h1 style="color:white;">{data.Title} Episode {number}</h1>
 			</div>
 			<div class="video-container">
-				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" width="770px;" height="442px;" allowfullscreen="true"></iframe>
+				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" width="1000px;" height="560px;" allowfullscreen="true"></iframe>
 			</div>
-			<div class="navigation"></div>
+			<br />
+			<div class="navigation">
+				{
+					parseInt(number) > 1 ? (
+						<a href={"/watch/" + title + "-episode-" + (parseInt(number) - 1)} class="button">
+							<ArrowLeft size="1.5rem" />
+						</a>
+					) : null
+				}
+				<a href={"/anime/" + slug.split("-episode")[0]}>View Anime</a>
+				{
+					parseInt(number) < data.Episodes ? (
+						<a href={"/watch/" + title + "-episode-" + (parseInt(number) + 1)} class="button">
+							<ArrowRight size="1.5rem" />
+						</a>
+					) : null
+				}
+			</div>
+			<br />
 			<div class="videos">
 				{
 					videos.map((video, index) => (

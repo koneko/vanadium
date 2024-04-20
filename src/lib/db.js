@@ -13,9 +13,7 @@ async function getAnimeEntry (AnimeID) {
 
 async function updateAnimeEntry (AnimeID) {
 	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
-	let shouldInsert = false
-	if (entry == undefined) {
-		shouldInsert = true
+	if (entry == undefined || ((Date.now() - parseInt(entry.LastUpdated)) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh)) {
 		entry = await scraper.get(AnimeID)
 	}
 	if (entry.Title == "Error 404") return null
@@ -27,30 +25,29 @@ async function updateAnimeEntry (AnimeID) {
 	const date = entry.Date
 	const genres = entry.Genres
 	const lastUpdated = Date.now()
-	if (shouldInsert) {
-		db.prepare("INSERT INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
-	} else {
-		if ((Date.now() - entry.LastUpdated) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh)
-			db.prepare("UPDATE Anime SET Title = ?, Aliases = ?, Image = ?, Description = ?, Episodes = ?, Date = ?, Genres = ?, LastUpdated = ? WHERE AnimeID = ?").run(title, aliases, image, description, episodes, date, genres, lastUpdated, AnimeID)
-	}
+	entry.LastUpdated = lastUpdated
+	db.prepare("INSERT OR REPLACE INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 }
 
 async function newEpisodes () {
 	let lastUpdatedTriggered = false
 	try {
 		const lastUpdated = db.prepare("SELECT * FROM CacheLastUpdated").get()
+		let lastUpdatedTime
 		if (lastUpdated == undefined) {
 			// upon first ever run of app, this will run.
 			let time = Date.now()
-			db.prepare("INSERT INTO CacheLastUpdated (Time) VALUES (?)").run(time)
+			db.prepare("INSERT INTO CacheLastUpdated (ID, Time) VALUES (1, ?)").run(time)
 			lastUpdatedTriggered = true
-			lastUpdated.Time = time
+			lastUpdatedTime = time
+		} else {
+			lastUpdatedTime = lastUpdated.Time
 		}
-		const lastUpdatedTime = lastUpdated.Time
+		// console.log(lastUpdatedTime)
 		const currentTime = Date.now()
 		let timeDifference = currentTime - lastUpdatedTime
 		timeDifference = Math.round(timeDifference / 1000)
-		console.log(timeDifference, cfg.timeToWaitBetweenCacheRefresh)
+		// console.log(timeDifference, cfg.timeToWaitBetweenCacheRefresh)
 		if (timeDifference >= cfg.timeToWaitBetweenCacheRefresh || lastUpdatedTriggered) {
 			let newEpisodes = await scraper.newEpisodes(1);
 			newEpisodes = newEpisodes.concat(await scraper.newEpisodes(2));
@@ -58,11 +55,13 @@ async function newEpisodes () {
 			db.prepare("DELETE FROM Cache").run()
 			for (let i = 0; i < newEpisodes.length; i++) {
 				const episode = newEpisodes[i]
-				updateAnimeEntry(episode.animeID)
+				await updateAnimeEntry(episode.animeID)
 				db.prepare("INSERT INTO Cache (title, image, episodeUrl, animeID, episode) VALUES (?, ?, ?, ?, ?)").run(episode.title, episode.image, episode.episodeUrl, episode.animeID, episode.episode)
 			}
-			let time = Date.now()
-			db.prepare("UPDATE CacheLastUpdated SET Time = ?").run(time)
+			if (!lastUpdatedTriggered) {
+				let time = Date.now()
+				db.prepare("UPDATE CacheLastUpdated SET Time = ?").run(time)
+			}
 
 		}
 		const cache = db.prepare("SELECT * FROM Cache").all()
