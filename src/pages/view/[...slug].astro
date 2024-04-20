@@ -85,7 +85,7 @@ if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 			<div class="navigation">
 				{
 					parseInt(number) > 1 ? (
-						<a href={"/watch/" + title + "-episode-" + (parseInt(number) - 1)} class="button">
+						<a href={"/view/" + title + "-episode-" + (parseInt(number) - 1)} class="button">
 							<ArrowLeft size="1.5rem" />
 						</a>
 					) : null
@@ -93,7 +93,7 @@ if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 				<a href={"/anime/" + slug.split("-episode")[0]}>View Anime</a>
 				{
 					parseInt(number) < data.Episodes ? (
-						<a href={"/watch/" + title + "-episode-" + (parseInt(number) + 1)} class="button">
+						<a href={"/view/" + title + "-episode-" + (parseInt(number) + 1)} class="button">
 							<ArrowRight size="1.5rem" />
 						</a>
 					) : null

@@ -15,18 +15,17 @@ async function updateAnimeEntry (AnimeID) {
 	let entry = db.prepare("SELECT * FROM Anime WHERE AnimeID = ?").get(AnimeID)
 	if (entry == undefined || ((Date.now() - parseInt(entry.LastUpdated)) / 1000 >= cfg.timeToWaitBetweenAnimeRefresh)) {
 		entry = await scraper.get(AnimeID)
+		if (entry.Title == "Error 404") return null
+		const title = entry.Title
+		const aliases = entry.Aliases
+		const image = entry.Image
+		const description = entry.Description
+		const episodes = entry.Episodes
+		const date = entry.Date
+		const genres = entry.Genres
+		const lastUpdated = Date.now()
+		db.prepare("INSERT OR REPLACE INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 	}
-	if (entry.Title == "Error 404") return null
-	const title = entry.Title
-	const aliases = entry.Aliases
-	const image = entry.Image
-	const description = entry.Description
-	const episodes = entry.Episodes
-	const date = entry.Date
-	const genres = entry.Genres
-	const lastUpdated = Date.now()
-	entry.LastUpdated = lastUpdated
-	db.prepare("INSERT OR REPLACE INTO Anime (AnimeID, Title, Aliases, Image, Description, Episodes, Date, Genres, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(AnimeID, title, aliases, image, description, episodes, date, genres, lastUpdated)
 }
 
 async function newEpisodes () {
@@ -47,7 +46,8 @@ async function newEpisodes () {
 		const currentTime = Date.now()
 		let timeDifference = currentTime - lastUpdatedTime
 		timeDifference = Math.round(timeDifference / 1000)
-		// console.log(timeDifference, cfg.timeToWaitBetweenCacheRefresh)
+		console.log("CACHE TIME DIFF: ")
+		console.log(timeDifference, cfg.timeToWaitBetweenCacheRefresh)
 		if (timeDifference >= cfg.timeToWaitBetweenCacheRefresh || lastUpdatedTriggered) {
 			let newEpisodes = await scraper.newEpisodes(1);
 			newEpisodes = newEpisodes.concat(await scraper.newEpisodes(2));
@@ -55,7 +55,6 @@ async function newEpisodes () {
 			db.prepare("DELETE FROM Cache").run()
 			for (let i = 0; i < newEpisodes.length; i++) {
 				const episode = newEpisodes[i]
-				await updateAnimeEntry(episode.animeID)
 				db.prepare("INSERT INTO Cache (title, image, episodeUrl, animeID, episode) VALUES (?, ?, ?, ?, ?)").run(episode.title, episode.image, episode.episodeUrl, episode.animeID, episode.episode)
 			}
 			if (!lastUpdatedTriggered) {
