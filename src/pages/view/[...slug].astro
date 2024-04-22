@@ -68,6 +68,20 @@ if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 		display: flex;
 		gap: 5px;
 	}
+
+	/* mobile */
+	@media (max-width: 600px) {
+		.videos {
+			flex-direction: column;
+			height: 50%;
+		}
+		.videos {
+			gap: 5px;
+		}
+		.navigation {
+			gap: 5px;
+		}
+	}
 </style>
 
 <Layout name={data.Title}>

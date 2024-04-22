@@ -1,0 +1,21 @@
+---
+import { db, searchFromDB } from "../lib/db.js";
+import { timeToWaitBetweenCacheRefresh, timeToWaitBetweenAnimeRefresh } from "../../cfg.json";
+
+const cacheLastUpdated = db.prepare("SELECT * FROM CacheLastUpdated").get();
+---
+
+<body>
+	<a href="/">root</a>
+	<a href="/api/newest.json">newest.json</a>
+	<input type="text" placeholder="token value" id="token" />
+	<button onclick="set()">set token</button>
+</body>
+
+<script is:inline>
+	function set() {
+		const token = document.getElementById("token").value;
+		localStorage.setItem("vanadiumToken", token);
+		document.location.reload();
+	}
+</script>
