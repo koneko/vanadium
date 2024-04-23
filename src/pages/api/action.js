@@ -1,4 +1,4 @@
-import * as manager from '../../lib/manage'
+import { updateStatus, removeFromList, addAnimeToList } from "../../lib/manage";
 export async function POST ({ request }) {
 	let response = null
 	let body = await request.formData()
@@ -9,11 +9,11 @@ export async function POST ({ request }) {
 	token = token.replace("Bearer ", "")
 	if (action == "updateStatus") {
 		let status = body.get('status')
-		response = new Response(JSON.stringify(await manager.updateStatus(AnimeID, status, token)))
+		response = new Response(JSON.stringify(await updateStatus(AnimeID, status, token)))
 	} else if (action == "removeFromList") {
-		response = new Response(JSON.stringify(await manager.removeFromList(AnimeID, token)))
+		response = new Response(JSON.stringify(await removeFromList(AnimeID, token)))
 	} else if (action == "addToList") {
-		response = new Response(JSON.stringify(await manager.addAnimeToList(AnimeID, token)))
+		response = new Response(JSON.stringify(await addAnimeToList(AnimeID, token)))
 	}
 	response.headers.set('Content-Type', 'application/json')
 	return response
