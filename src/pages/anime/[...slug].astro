@@ -2,12 +2,19 @@
 import Layout from "../../layouts/Layout.astro";
 import CenteredContainer from "../../components/CenteredContainer.astro";
 import { getAnimeEntry } from "../../lib/db.js";
+import { getAnimeFromList, numberToStatus } from "../../lib/manage.js";
 
 let AnimeID = Astro.params.slug;
 let Anime = await getAnimeEntry(AnimeID);
 if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
 
 let isUserLoggedIn = false;
+let token = Astro.cookies.get("VanadiumToken").value;
+if (token) {
+	isUserLoggedIn = true;
+}
+
+let listItem = await getAnimeFromList(AnimeID, token);
 
 let episodeMapArr = [];
 for (let i = 0; i < Anime.Episodes; i++) {
@@ -53,10 +60,25 @@ for (let i = 0; i < Anime.Episodes; i++) {
 		color: var(--accent);
 	}
 	.episodes {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 25px;
 		margin: 1rem 0;
+	}
+	.episodes div {
+		width: 300px;
+	}
+	button {
+		padding: 0.5rem;
+		border-radius: 5px;
+		border: none;
+		background-color: dodgerblue;
+		color: white;
+		font-weight: bolder;
+	}
+	.actions {
+		display: flex;
+		gap: 10px;
 	}
 	/* mobile */
 	@media (max-width: 768px) {
@@ -118,12 +140,21 @@ for (let i = 0; i < Anime.Episodes; i++) {
 					)
 				}
 				{
-					isUserLoggedIn && (
-						<div class="actions">
-							<button>Add to List</button>
-						</div>
+					listItem && (
+						<>
+							<p>
+								<b style="color: dodgerblue">Current Episode: </b> {listItem.CurrentEpisode}{" "}
+							</p>
+							<p>
+								<b style="color:dodgerblue;">Status: </b> {numberToStatus(listItem.Status)}
+							</p>
+						</>
 					)
 				}
+				<div class="actions">
+					{listItem && <button>Edit Information</button>}
+					{isUserLoggedIn && <div>{listItem ? <button onclick="action('removeFromList')">Remove From List</button> : <button onclick="action('addToList')">Add To List</button>}</div>}
+				</div>
 				<div class="episodes">
 					{
 						episodeMapArr.map((episode) => (
@@ -137,3 +168,29 @@ for (let i = 0; i < Anime.Episodes; i++) {
 		</div>
 	</CenteredContainer>
 </Layout>
+
+<!-- pocetak debilnosti astro kreatora, majke mi zasto oni ovo ovak rade -->
+<script define:vars={{ token, AnimeID }} is:inline>
+	window.token = token;
+	window.AnimeID = AnimeID;
+</script>
+
+<script is:inline>
+	function action(action) {
+		let data = new FormData();
+		data.append("action", action);
+		data.append("AnimeID", window.AnimeID);
+		fetch("/api/action", {
+			method: "POST",
+			headers: {
+				Authorization: "Bearer " + window.token,
+			},
+			body: data,
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				window.location.reload();
+			});
+	}
+</script>
+<!-- boze dragi -->

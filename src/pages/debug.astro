@@ -15,7 +15,9 @@ const cacheLastUpdated = db.prepare("SELECT * FROM CacheLastUpdated").get();
 <script is:inline>
 	function set() {
 		const token = document.getElementById("token").value;
-		localStorage.setItem("vanadiumToken", token);
-		document.location.reload();
+		document.cookie = `VanadiumToken=${token}; expires=Fri, 31 Dec 2100 23:59:59 GMT`;
+		console.log("token set");
+		// log
+		console.log(document.cookie);
 	}
 </script>

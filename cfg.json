@@ -1,6 +1,6 @@
 {
 	"url": "https://gogoanime3.co/",
-	"timeToWaitBetweenAnimeRefresh": 1200,
+	"timeToWaitBetweenAnimeRefresh": 1800,
 	"timeToWaitBetweenCacheRefresh": 300,
 	"accountCreationEnabled": true,
 	"loginEnabled": true,

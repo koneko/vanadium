@@ -4,14 +4,13 @@ import CenteredContainer from "../../components/CenteredContainer.astro";
 import { ArrowLeft, ArrowRight } from "@astropub/icons";
 import { getSources } from "../../lib/scraper.js";
 import { getAnimeEntry } from "../../lib/db";
+import { updateCurrentEpisode, getAnimeFromList } from "../../lib/manage.js";
 
 let slug = Astro.params.slug;
 let title = slug.split("-episode")[0];
 let videos, data, image, number, trytitle;
 videos = await getSources("/" + slug);
 data = await getAnimeEntry(title);
-// data.Title = data.Title.replace(/"/g, "");
-console.log(data);
 image = data.Image;
 number = slug.split("episode-")[1];
 if (videos.length == 0) {
@@ -22,6 +21,17 @@ if (videos.length == 0) {
 	videos = await getSources("/" + trytitle);
 }
 if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
+
+let isUserLoggedIn = false;
+let token = Astro.cookies.get("VanadiumToken").value;
+if (token) {
+	isUserLoggedIn = true;
+}
+
+if (isUserLoggedIn) {
+	let listItem = await getAnimeFromList(title, token);
+	if (listItem) await updateCurrentEpisode(title, number, token);
+}
 ---
 
 <style>
