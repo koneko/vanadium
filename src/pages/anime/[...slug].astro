@@ -80,6 +80,9 @@ for (let i = 0; i < Anime.Episodes; i++) {
 		display: flex;
 		gap: 10px;
 	}
+	button {
+		cursor: pointer;
+	}
 	/* mobile */
 	@media (max-width: 768px) {
 		.top {
@@ -152,7 +155,14 @@ for (let i = 0; i < Anime.Episodes; i++) {
 					)
 				}
 				<div class="actions">
-					{listItem && <button>Edit Information</button>}
+					{listItem && <button onclick="editInformation()">Edit Information</button>}
+					{
+						listItem && (
+							<button id="favourite-btn" onclick="action('favourite')">
+								Favourite
+							</button>
+						)
+					}
 					{isUserLoggedIn && <div>{listItem ? <button onclick="action('removeFromList')">Remove From List</button> : <button onclick="action('addToList')">Add To List</button>}</div>}
 				</div>
 				<div class="episodes">

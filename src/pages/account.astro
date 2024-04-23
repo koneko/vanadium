@@ -1,0 +1,65 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CenteredContainer from "../components/CenteredContainer.astro";
+import GridContainer from "../components/GridContainer.astro";
+import AnimeCard from "../components/AnimeCard.astro";
+import { getAnimeFromList, numberToStatus, getUserInfo, getUserList } from "../lib/manage.js";
+import { getAnimeEntry } from "../lib/db.js";
+
+let userInfo;
+let userList;
+let token = Astro.cookies.get("VanadiumToken").value;
+if (token) {
+	userInfo = await getUserInfo(token);
+	userList = await getUserList(token);
+} else {
+	Astro.redirect("/login");
+}
+
+let conformedData = [];
+for (let i = 0; i < userList.length; i++) {
+	let anime = userList[i];
+	let entry = await getAnimeEntry(anime.AnimeID);
+	conformedData.push({
+		Title: entry.Title,
+		Image: entry.Image,
+		AnimeID: anime.AnimeID,
+		CurrentEpisode: anime.CurrentEpisode,
+		Status: numberToStatus(anime.Status),
+		Favourite: anime.Favourite.toString(),
+	});
+}
+---
+
+<style is:inline>
+	.container {
+		color: white;
+	}
+	.item > .left {
+		filter: brightness(0.6) !important;
+	}
+	.item > .right {
+		opacity: 1 !important;
+		filter: brightness(1) !important;
+		text-shadow: none !important;
+		/* color: dodgerblue !important; */
+	}
+</style>
+
+<style>
+	.offset {
+		height: 2rem;
+	}
+</style>
+
+<Layout name="Account">
+	<CenteredContainer>
+		<div class="offset"></div>
+		<h3>Hi, <span style="color: var(--accent)">{userInfo.Name}</span>. You are currently keeping track of <span style="color: dodgerblue;">{userList.length}</span> anime.</h3>
+		<br />
+		<GridContainer>
+			<!-- {userList.length > 0 && userList.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} currentEpisode="0" accountPage={false} status="" favourite="" />)} -->
+			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
+		</GridContainer>
+	</CenteredContainer>
+</Layout>

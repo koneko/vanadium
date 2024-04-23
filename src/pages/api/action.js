@@ -1,4 +1,4 @@
-import { updateStatus, removeFromList, addAnimeToList } from "../../lib/manage";
+import { updateStatus, removeFromList, addAnimeToList, alterFavourite } from "../../lib/manage";
 export async function POST ({ request }) {
 	let response = null
 	let body = await request.formData()
@@ -14,6 +14,8 @@ export async function POST ({ request }) {
 		response = new Response(JSON.stringify(await removeFromList(AnimeID, token)))
 	} else if (action == "addToList") {
 		response = new Response(JSON.stringify(await addAnimeToList(AnimeID, token)))
+	} else if (action == "favourite") {
+		response = new Response(JSON.stringify(await alterFavourite(AnimeID, token)))
 	}
 	response.headers.set('Content-Type', 'application/json')
 	return response

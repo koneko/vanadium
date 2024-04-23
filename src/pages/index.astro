@@ -9,6 +9,6 @@ let recentAnime = await newEpisodes();
 
 <Layout name="New Episodes">
 	<GridContainer>
-		{recentAnime.map((anime) => <AnimeCard name={anime.Title + " Episode " + anime.Episode} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} />)}
+		{recentAnime.map((anime) => <AnimeCard name={anime.Title + " Episode " + anime.Episode} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} currentEpisode="0" accountPage={false} status="" favourite="" />)}
 	</GridContainer>
 </Layout>

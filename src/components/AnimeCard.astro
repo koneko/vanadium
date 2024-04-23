@@ -5,6 +5,10 @@ interface Props {
 	id: string;
 	hasEye: boolean;
 	episode: string;
+	accountPage: boolean;
+	currentEpisode: string;
+	status: string;
+	favourite: string;
 }
 const { src, name, id, episode } = Astro.props;
 import EyeOpen from "@astropub/icons/EyeOpen";
@@ -94,6 +98,21 @@ import EyeClosed from "@astropub/icons/EyeClosed";
 						<EyeOpen class="open" size="32" color="var(--accent)" />
 					</a>
 				</span>
+			) : null
+		}
+		{
+			Astro.props.accountPage ? (
+				<>
+					<span>
+						<p>Current Episode: {Astro.props.currentEpisode}</p>
+					</span>
+					<span>
+						<p>Status: {Astro.props.status}</p>
+					</span>
+					<span>
+						<p>Favourite: {Astro.props.favourite}</p>
+					</span>
+				</>
 			) : null
 		}
 	</div>

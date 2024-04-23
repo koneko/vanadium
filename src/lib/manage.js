@@ -34,6 +34,7 @@ export function addAnimeToList (anime, token) {
 		AnimeID: anime,
 		CurrentEpisode: 0,
 		Status: STATUS.Watching,
+		Favourite: false,
 		LastUpdated: Date.now()
 	}
 	userList.push(object)
@@ -102,4 +103,24 @@ export async function getUserList (token) {
 	if (user == undefined) return 403 // Forbidden
 	const userList = JSON.parse(user.Anime)
 	return userList
+}
+
+export async function getUserInfo (token) {
+	const user = db.prepare("SELECT * FROM User WHERE Token = ?").get(token)
+	if (user == undefined) return false // Forbidden
+	return user
+}
+
+export async function alterFavourite (animeID, token) {
+	const user = db.prepare("SELECT * FROM User WHERE Token = ?").get(token)
+	if (user == undefined) return 403 // Forbidden
+	const userList = JSON.parse(user.Anime)
+	for (let i = 0; i < userList.length; i++) {
+		if (userList[i].AnimeID == animeID) {
+			userList[i].Favourite = !userList[i].Favourite
+			db.prepare("UPDATE User SET Anime = ? WHERE Token = ?").run(JSON.stringify(userList), token)
+			return { status: 200 } // OK
+		}
+	}
+	return { status: 404 } // Not Found
 }
