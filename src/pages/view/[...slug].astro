@@ -22,12 +22,14 @@ if (videos.length == 0) {
 }
 if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 
+let token = "";
 let isUserLoggedIn = false;
-let token = Astro.cookies.get("VanadiumToken").value;
-if (token) {
-	isUserLoggedIn = true;
+if (Astro.cookies.has("VanadiumToken")) {
+	token = Astro.cookies.get("VanadiumToken").value;
+	if (token) {
+		isUserLoggedIn = true;
+	}
 }
-
 if (isUserLoggedIn) {
 	let listItem = await getAnimeFromList(title, token);
 	if (listItem) await updateCurrentEpisode(title, number, token);

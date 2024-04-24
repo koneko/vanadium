@@ -6,16 +6,11 @@ import AnimeCard from "../components/AnimeCard.astro";
 import { getAnimeFromList, numberToStatus, getUserInfo, getUserList } from "../lib/manage.js";
 import { getAnimeEntry } from "../lib/db.js";
 
-let userInfo;
-let userList;
-let token = Astro.cookies.get("VanadiumToken").value;
-if (token) {
-	userInfo = await getUserInfo(token);
-	userList = await getUserList(token);
-} else {
-	Astro.redirect("/login");
-}
+if (!Astro.cookies.has("VanadiumToken")) return Astro.redirect("/login");
 
+let token = Astro.cookies.get("VanadiumToken").value;
+let userInfo = await getUserInfo(token);
+let userList = await getUserList(token);
 let conformedData = [];
 for (let i = 0; i < userList.length; i++) {
 	let anime = userList[i];

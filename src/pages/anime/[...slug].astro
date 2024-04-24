@@ -9,9 +9,12 @@ let Anime = await getAnimeEntry(AnimeID);
 if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
 
 let isUserLoggedIn = false;
-let token = Astro.cookies.get("VanadiumToken").value;
-if (token) {
-	isUserLoggedIn = true;
+let token = "";
+if (Astro.cookies.has("VanadiumToken")) {
+	token = Astro.cookies.get("VanadiumToken").value;
+	if (token) {
+		isUserLoggedIn = true;
+	}
 }
 
 let listItem = await getAnimeFromList(AnimeID, token);
