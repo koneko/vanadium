@@ -18,6 +18,7 @@ if (Astro.cookies.has("VanadiumToken")) {
 }
 
 let listItem = await getAnimeFromList(AnimeID, token);
+// console.log(listItem);
 
 let episodeMapArr = [];
 for (let i = 0; i < Anime.Episodes; i++) {
@@ -152,13 +153,22 @@ for (let i = 0; i < Anime.Episodes; i++) {
 								<b style="color: dodgerblue">Current Episode: </b> {listItem.CurrentEpisode}{" "}
 							</p>
 							<p>
-								<b style="color:dodgerblue;">Status: </b> {numberToStatus(listItem.Status)}
+								<b style="color:dodgerblue;">Status: </b> <span id="status-span">{numberToStatus(listItem.Status)}</span>
+							</p>
+							<p>
+								<b style="color: dodgerblue">Favourite: </b> {listItem.Favourite.toString()}{" "}
 							</p>
 						</>
 					)
 				}
 				<div class="actions">
-					{listItem && <button onclick="editInformation()">Edit Information</button>}
+					{
+						listItem && (
+							<button id="edit-status-btn" onclick="editStatus()">
+								Edit Status
+							</button>
+						)
+					}
 					{
 						listItem && (
 							<button id="favourite-btn" onclick="action('favourite')">
@@ -189,6 +199,7 @@ for (let i = 0; i < Anime.Episodes; i++) {
 </script>
 
 <script is:inline>
+	let statusSelection = false;
 	function action(action) {
 		let data = new FormData();
 		data.append("action", action);
@@ -204,6 +215,57 @@ for (let i = 0; i < Anime.Episodes; i++) {
 			.then((data) => {
 				window.location.reload();
 			});
+	}
+	function editStatus() {
+		if (statusSelection) {
+			let element = document.getElementById("status-span");
+			let select = document.getElementById("status-select");
+			let status = select.value;
+			element.innerHTML = status;
+			let data = new FormData();
+			data.append("action", "editStatus");
+			data.append("AnimeID", window.AnimeID);
+			data.append("status", parseInt(status));
+			fetch("/api/action", {
+				method: "POST",
+				headers: {
+					Authorization: "Bearer " + window.token,
+				},
+				body: data,
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					window.location.reload();
+				});
+		} else {
+			let element = document.getElementById("status-span");
+			// select
+			let select = document.createElement("select");
+			select.id = "status-select";
+			select.style.width = "50%";
+			select.style.padding = "0.5rem";
+			select.style.borderRadius = "5px";
+			select.style.border = "none";
+			select.style.backgroundColor = "dodgerblue";
+			select.style.color = "white";
+			select.style.fontWeight = "bolder";
+			select.style.cursor = "pointer";
+
+			// options
+			let options = ["Watching", "Completed", "On Hold", "Dropped", "Plan to Watch"];
+			options.forEach((option, index) => {
+				let opt = document.createElement("option");
+				opt.value = index + 1;
+				opt.innerHTML = option;
+				select.appendChild(opt);
+			});
+
+			select.value = 1;
+			element.innerHTML = "";
+			element.appendChild(select);
+			document.getElementById("edit-status-btn").innerHTML = "Save";
+			statusSelection = true;
+		}
 	}
 </script>
 <!-- boze dragi -->

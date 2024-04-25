@@ -7,8 +7,9 @@ export async function POST ({ request }) {
 	let token = request.headers.get('Authorization')
 	if (token == undefined) return new Response("No token provided", { status: 401 })
 	token = token.replace("Bearer ", "")
-	if (action == "updateStatus") {
+	if (action == "editStatus") {
 		let status = body.get('status')
+		status = parseInt(status)
 		response = new Response(JSON.stringify(await updateStatus(AnimeID, status, token)))
 	} else if (action == "removeFromList") {
 		response = new Response(JSON.stringify(await removeFromList(AnimeID, token)))
