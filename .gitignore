@@ -24,5 +24,6 @@ pnpm-debug.log*
 .idea/
 
 anime.db
+anime.db.bak
 anime.db-shm
 anime.db-wal
