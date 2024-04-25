@@ -54,7 +54,7 @@ for (let i = 0; i < userList.length; i++) {
 		<br />
 		<GridContainer>
 			<!-- {userList.length > 0 && userList.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} currentEpisode="0" accountPage={false} status="" favourite="" />)} -->
-			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
+			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view/" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
 		</GridContainer>
 	</CenteredContainer>
 </Layout>
