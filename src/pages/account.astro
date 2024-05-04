@@ -24,6 +24,18 @@ for (let i = 0; i < userList.length; i++) {
 		Favourite: anime.Favourite.toString(),
 	});
 }
+conformedData.sort((a, b) => {
+	if (a.Title < b.Title) return -1;
+	if (a.Title > b.Title) return 1;
+	return 0;
+});
+if (Astro.url.searchParams.get("sort")) {
+	let sort = parseInt(Astro.url.searchParams.get("sort"));
+	if (sort != 0) conformedData = conformedData.filter((anime) => anime.Status == numberToStatus(sort));
+}
+if (Astro.url.searchParams.get("favourite")) {
+	conformedData = conformedData.filter((anime) => anime.Favourite == "true");
+}
 ---
 
 <style is:inline>
@@ -37,7 +49,20 @@ for (let i = 0; i < userList.length; i++) {
 		opacity: 1 !important;
 		filter: brightness(1) !important;
 		text-shadow: none !important;
-		/* color: dodgerblue !important; */
+	}
+	.actions {
+		display: flex;
+		margin-top: 5px;
+		gap: 10px;
+	}
+	.actions > a {
+		color: white;
+		text-decoration: underline;
+	}
+	@media screen and (max-width: 600px) {
+		.actions {
+			flex-direction: column;
+		}
 	}
 </style>
 
@@ -51,10 +76,32 @@ for (let i = 0; i < userList.length; i++) {
 	<CenteredContainer>
 		<div class="offset"></div>
 		<h3>Hi, <span style="color: var(--accent)">{userInfo.Name}</span>. You are currently keeping track of <span style="color: dodgerblue;">{userList.length}</span> anime.</h3>
+		<div class="actions">
+			<a href="javascript:void(0);" onclick="javascript:func()">Favourite</a>
+			<a href="/account">All</a>
+			<a href="?sort=1">Watching</a>
+			<a href="?sort=2">Completed</a>
+			<a href="?sort=3">On Hold</a>
+			<a href="?sort=4">Dropped</a>
+			<a href="?sort=5">Plan to Watch</a>
+		</div>
 		<br />
 		<GridContainer>
-			<!-- {userList.length > 0 && userList.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} currentEpisode="0" accountPage={false} status="" favourite="" />)} -->
-			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/view/" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
+			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/anime/" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
 		</GridContainer>
 	</CenteredContainer>
 </Layout>
+
+<script is:inline>
+	let params = new URLSearchParams(window.location.search);
+	let favourite = params.get("favourite");
+	function func() {
+		if (favourite) {
+			params.delete("favourite");
+			window.location.search = params.toString();
+		} else {
+			params.set("favourite", "1");
+			window.location.search = params.toString();
+		}
+	}
+</script>
