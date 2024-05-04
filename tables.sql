@@ -1,5 +1,5 @@
 CREATE TABLE User (
-    ID      INT  PRIMARY KEY AUTOINCREMENT,
+    ID      INTEGER  PRIMARY KEY AUTOINCREMENT,
     Name    TEXT NOT NULL UNIQUE,
     Token   TEXT NOT NULL,
     IsAdmin BOOL NOT NULL,
@@ -18,8 +18,8 @@ CREATE TABLE Cache (
 );
 
 CREATE TABLE CacheLastUpdated (
-    ID   INT PRIMARY KEY UNIQUE AUTOINCREMENT,
-    Time INT NOT NULL
+    ID   INTEGER PRIMARY KEY AUTOINCREMENT,
+    Time INTEGER NOT NULL
 );
 
 CREATE TABLE Anime (
@@ -31,6 +31,6 @@ CREATE TABLE Anime (
     Episodes    INTEGER NOT NULL,
     Date        TEXT    NOT NULL,
     Genres      TEXT    NOT NULL,
-    LastUpdated INT     NOT NULL
+    LastUpdated INTEGER     NOT NULL
 );
 

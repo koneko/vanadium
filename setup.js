@@ -1,5 +1,5 @@
-const { Database } = require("better-sqlite3")
-const fs = require("fs")
+import Database from "better-sqlite3"
+import fs from "fs"
 const db = new Database("anime.db")
 const data = fs.readFileSync("tables.sql", "utf-8")
 db.exec(data)
