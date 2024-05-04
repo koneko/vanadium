@@ -1,10 +1,11 @@
 #!/bin/bash
 XTMPDIR=false
+TIME=$(date +%s)
 
 if [ -d "dist" ]; then
   echo "Dist found, making backup."
-  cp dist/server/anime.db /tmp/anime.db.bak
-  X=true
+  cp dist/server/anime.db /tmp/$TIME.anime.db.bak
+  XTMPDIR=true
 fi
 
 git pull
@@ -21,7 +22,7 @@ echo "Build done."
 
 if [ "$XTMPDIR" = true ]; then
   echo "Restoring backup"
-  cp /tmp/anime.db.bak dist/server/anime.db
+  cp /tmp/$TIME.anime.db.bak dist/server/anime.db
 fi
 
 echo "Vanadium should be usable, glhf."
