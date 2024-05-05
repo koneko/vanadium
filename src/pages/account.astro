@@ -3,8 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import CenteredContainer from "../components/CenteredContainer.astro";
 import GridContainer from "../components/GridContainer.astro";
 import AnimeCard from "../components/AnimeCard.astro";
-import { getAnimeFromList, numberToStatus, getUserInfo, getUserList } from "../lib/manage.js";
+import { numberToStatus, getUserInfo, getUserList } from "../lib/manage.js";
 import { getAnimeEntry } from "../lib/db.js";
+import FuzzySearch from "fuzzy-search";
 
 if (!Astro.cookies.has("VanadiumToken")) return Astro.redirect("/login");
 
@@ -29,6 +30,14 @@ conformedData.sort((a, b) => {
 	if (a.Title > b.Title) return 1;
 	return 0;
 });
+if (Astro.url.searchParams.get("vq")) {
+	let query = Astro.url.searchParams.get("vq");
+	// conformedData = await queryUserAnimeList(token, query);
+	let searcher = new FuzzySearch(conformedData, ["Title", "Aliases"], {
+		caseSensitive: false,
+	});
+	conformedData = searcher.search(query);
+}
 if (Astro.url.searchParams.get("sort")) {
 	let sort = parseInt(Astro.url.searchParams.get("sort"));
 	if (sort != 0) conformedData = conformedData.filter((anime) => anime.Status == numberToStatus(sort));
@@ -53,11 +62,29 @@ if (Astro.url.searchParams.get("favourite")) {
 	.actions {
 		display: flex;
 		margin-top: 5px;
+		margin-bottom: 5px;
 		gap: 10px;
 	}
 	.actions > a {
 		color: white;
 		text-decoration: underline;
+	}
+	.fzf {
+		display: flex;
+		gap: 10px;
+	}
+	.fzf > input {
+		padding: 5px;
+		border: none;
+		border-radius: 5px;
+	}
+	.fzf > button {
+		padding: 5px;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		background-color: var(--accent);
+		color: white;
 	}
 	@media screen and (max-width: 600px) {
 		.actions {
@@ -78,12 +105,16 @@ if (Astro.url.searchParams.get("favourite")) {
 		<h3>Hi, <span style="color: var(--accent)">{userInfo.Name}</span>. You are currently keeping track of <span style="color: dodgerblue;">{userList.length}</span> anime.</h3>
 		<div class="actions">
 			<a href="javascript:void(0);" onclick="javascript:func()">Favourite</a>
-			<a href="/account">All</a>
-			<a href="?sort=1">Watching</a>
-			<a href="?sort=2">Completed</a>
-			<a href="?sort=3">On Hold</a>
-			<a href="?sort=4">Dropped</a>
-			<a href="?sort=5">Plan to Watch</a>
+			<a href="/account">All/Reset</a>
+			<a href="javascript:void(0);" onclick="javascript:func('1')">Watching</a>
+			<a href="javascript:void(0);" onclick="javascript:func('2')">Completed</a>
+			<a href="javascript:void(0);" onclick="javascript:func('3')">On Hold</a>
+			<a href="javascript:void(0);" onclick="javascript:func('4')">Dropped</a>
+			<a href="javascript:void(0);" onclick="javascript:func('5')">Plan to Watch</a>
+		</div>
+		<div class="fzf">
+			<input type="text" placeholder="Search..." />
+			<button onclick="fzf()">Search</button>
 		</div>
 		<br />
 		<GridContainer>
@@ -95,13 +126,25 @@ if (Astro.url.searchParams.get("favourite")) {
 <script is:inline>
 	let params = new URLSearchParams(window.location.search);
 	let favourite = params.get("favourite");
-	function func() {
-		if (favourite) {
-			params.delete("favourite");
+	document.querySelector(".fzf > input").value = params.get("vq") || "";
+	function func(num) {
+		if (num) {
+			params.set("sort", num);
 			window.location.search = params.toString();
 		} else {
-			params.set("favourite", "1");
-			window.location.search = params.toString();
+			if (favourite) {
+				params.delete("favourite");
+				window.location.search = params.toString();
+			} else {
+				params.set("favourite", "1");
+				window.location.search = params.toString();
+			}
+		}
+	}
+	function fzf() {
+		let query = document.querySelector(".fzf > input").value;
+		if (query) {
+			window.location.href = "/account?vq=" + query;
 		}
 	}
 </script>

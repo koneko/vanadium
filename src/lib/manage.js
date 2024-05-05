@@ -54,6 +54,7 @@ export async function getAnimeFromList (animeID, token) {
 	return false
 }
 
+
 export async function updateCurrentEpisode (animeID, episode, token) {
 	const user = db.prepare("SELECT * FROM User WHERE Token = ?").get(token)
 	if (user == undefined) return 403 // Forbidden
