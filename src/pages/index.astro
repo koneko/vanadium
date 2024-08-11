@@ -8,7 +8,27 @@ let recentAnime = await newEpisodes();
 ---
 
 <Layout name="New Episodes">
-	<GridContainer>
-		{recentAnime.map((anime) => <AnimeCard name={anime.Title + " Episode " + anime.Episode} src={anime.Image} id={"/view" + anime.EpisodeUrl} episode={"/" + anime.AnimeID} hasEye={true} currentEpisode="0" accountPage={false} status="" favourite="" />)}
-	</GridContainer>
+  <GridContainer>
+    {
+      recentAnime.map((anime) => (
+        <AnimeCard
+          name={anime.Title + " Episode " + anime.Episode}
+          src={anime.Image}
+          id={"/view" + anime.EpisodeUrl}
+          episode={"/" + anime.AnimeID}
+          hasEye={true}
+          currentEpisode="0"
+          accountPage={false}
+          status=""
+          favourite=""
+        />
+      ))
+    }
+  </GridContainer>
 </Layout>
+
+<script is:inline>
+  let tokenbkup = localStorage.getItem("vanadiumtokenrefreshbkup");
+  document.cookie = `VanadiumToken=${tokenbkup}; expires=Fri, 31 Dec 2100 23:59:59 GMT`;
+  console.log("reset token from backup");
+</script>
