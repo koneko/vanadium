@@ -14,7 +14,7 @@
     "@astrojs/node": "^8.2.5",
     "@astropub/icons": "^0.2.0",
     "astro": "^4.5.15",
-    "better-sqlite3": "^9.5.0",
+    "better-sqlite3": "^11.1.2",
     "cheerio": "^1.0.0-rc.12",
     "crypto-es": "^2.1.0",
     "fuzzy-search": "^3.2.1"

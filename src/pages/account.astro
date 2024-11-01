@@ -14,137 +14,161 @@ let userInfo = await getUserInfo(token);
 let userList = await getUserList(token);
 let conformedData = [];
 for (let i = 0; i < userList.length; i++) {
-	let anime = userList[i];
-	let entry = await getAnimeEntry(anime.AnimeID);
-	conformedData.push({
-		Title: entry.Title,
-		Image: entry.Image,
-		AnimeID: anime.AnimeID,
-		CurrentEpisode: anime.CurrentEpisode,
-		Status: numberToStatus(anime.Status),
-		Favourite: anime.Favourite.toString(),
-	});
+  let anime = userList[i];
+  let entry = await getAnimeEntry(anime.AnimeID);
+  conformedData.push({
+    Title: entry.Title,
+    Image: entry.Image,
+    AnimeID: anime.AnimeID,
+    CurrentEpisode: anime.CurrentEpisode,
+    Status: numberToStatus(anime.Status),
+    Favourite: anime.Favourite.toString(),
+  });
 }
 conformedData.sort((a, b) => {
-	if (a.Title < b.Title) return -1;
-	if (a.Title > b.Title) return 1;
-	return 0;
+  if (a.Title < b.Title) return -1;
+  if (a.Title > b.Title) return 1;
+  return 0;
 });
 if (Astro.url.searchParams.get("vq")) {
-	let query = Astro.url.searchParams.get("vq");
-	// conformedData = await queryUserAnimeList(token, query);
-	let searcher = new FuzzySearch(conformedData, ["Title", "Aliases"], {
-		caseSensitive: false,
-	});
-	conformedData = searcher.search(query);
+  let query = Astro.url.searchParams.get("vq");
+  // conformedData = await queryUserAnimeList(token, query);
+  let searcher = new FuzzySearch(conformedData, ["Title", "Aliases"], {
+    caseSensitive: false,
+  });
+  conformedData = searcher.search(query);
 }
 if (Astro.url.searchParams.get("sort")) {
-	let sort = parseInt(Astro.url.searchParams.get("sort"));
-	if (sort != 0) conformedData = conformedData.filter((anime) => anime.Status == numberToStatus(sort));
+  let sort = parseInt(Astro.url.searchParams.get("sort"));
+  if (sort != 0)
+    conformedData = conformedData.filter(
+      (anime) => anime.Status == numberToStatus(sort)
+    );
 }
 if (Astro.url.searchParams.get("favourite")) {
-	conformedData = conformedData.filter((anime) => anime.Favourite == "true");
+  conformedData = conformedData.filter((anime) => anime.Favourite == "true");
 }
 ---
 
 <style is:inline>
-	.container {
-		color: white;
-	}
-	.item > .left {
-		filter: brightness(0.6) !important;
-	}
-	.item > .right {
-		opacity: 1 !important;
-		filter: brightness(1) !important;
-		text-shadow: none !important;
-	}
-	.actions {
-		display: flex;
-		margin-top: 5px;
-		margin-bottom: 5px;
-		gap: 10px;
-	}
-	.actions > a {
-		color: white;
-		text-decoration: underline;
-	}
-	.fzf {
-		display: flex;
-		gap: 10px;
-	}
-	.fzf > input {
-		padding: 5px;
-		border: none;
-		border-radius: 5px;
-	}
-	.fzf > button {
-		padding: 5px;
-		border: none;
-		border-radius: 5px;
-		cursor: pointer;
-		background-color: var(--accent);
-		color: white;
-	}
-	@media screen and (max-width: 600px) {
-		.actions {
-			flex-direction: column;
-		}
-	}
+  .container {
+    color: white;
+  }
+  .item > .left {
+    filter: brightness(0.6) !important;
+  }
+  .item > .right {
+    opacity: 1 !important;
+    filter: brightness(1) !important;
+    text-shadow: none !important;
+  }
+  .actions {
+    display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    gap: 10px;
+  }
+  .actions > a {
+    color: white;
+    text-decoration: underline;
+  }
+  .fzf {
+    display: flex;
+    gap: 10px;
+  }
+  .fzf > input {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+  }
+  .fzf > button {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--accent);
+    color: white;
+  }
+  @media screen and (max-width: 600px) {
+    .actions {
+      flex-direction: column;
+    }
+  }
 </style>
 
 <style>
-	.offset {
-		height: 2rem;
-	}
+  .offset {
+    height: 2rem;
+  }
 </style>
 
 <Layout name="Account">
-	<CenteredContainer>
-		<div class="offset"></div>
-		<h3>Hi, <span style="color: var(--accent)">{userInfo.Name}</span>. You are currently keeping track of <span style="color: dodgerblue;">{userList.length}</span> anime.</h3>
-		<div class="actions">
-			<a href="javascript:void(0);" onclick="javascript:func()">Favourite</a>
-			<a href="/account">All/Reset</a>
-			<a href="javascript:void(0);" onclick="javascript:func('1')">Watching</a>
-			<a href="javascript:void(0);" onclick="javascript:func('2')">Completed</a>
-			<a href="javascript:void(0);" onclick="javascript:func('3')">On Hold</a>
-			<a href="javascript:void(0);" onclick="javascript:func('4')">Dropped</a>
-			<a href="javascript:void(0);" onclick="javascript:func('5')">Plan to Watch</a>
-		</div>
-		<div class="fzf">
-			<input type="text" placeholder="Search..." />
-			<button onclick="fzf()">Search</button>
-		</div>
-		<br />
-		<GridContainer>
-			{userList.length > 0 && conformedData.map((anime) => <AnimeCard name={anime.Title} src={anime.Image} id={"/anime/" + anime.AnimeID} episode="" hasEye={false} accountPage={true} currentEpisode={anime.CurrentEpisode} status={anime.Status} favourite={anime.Favourite} />)}
-		</GridContainer>
-	</CenteredContainer>
+  <CenteredContainer>
+    <div class="offset"></div>
+    <h3>
+      Hi, <span style="color: var(--accent)">{userInfo.Name}</span>. You are
+      currently keeping track of <span style="color: dodgerblue;"
+        >{userList.length}</span
+      > anime.
+    </h3>
+    <div class="actions">
+      <a href="javascript:void(0);" onclick="
+func()">Favourite</a>
+      <a href="/account">All/Reset</a>
+      <a href="javascript:void(0);" onclick="func('1')">Watching</a>
+      <a href="javascript:void(0);" onclick="func('2')">Completed</a>
+      <a href="javascript:void(0);" onclick="func('3')">On Hold</a>
+      <a href="javascript:void(0);" onclick="func('4')">Dropped</a>
+      <a href="javascript:void(0);" onclick="func('5')">Plan to Watch</a>
+    </div>
+    <div class="fzf">
+      <input type="text" placeholder="Search..." />
+      <button onclick="fzf()">Search</button>
+    </div>
+    <br />
+    <GridContainer>
+      {
+        userList.length > 0 &&
+          conformedData.map((anime) => (
+            <AnimeCard
+              name={anime.Title}
+              src={anime.Image}
+              id={"/anime/" + anime.AnimeID}
+              episode=""
+              hasEye={false}
+              accountPage={true}
+              currentEpisode={anime.CurrentEpisode}
+              status={anime.Status}
+              favourite={anime.Favourite}
+            />
+          ))
+      }
+    </GridContainer>
+  </CenteredContainer>
 </Layout>
 
 <script is:inline>
-	let params = new URLSearchParams(window.location.search);
-	let favourite = params.get("favourite");
-	document.querySelector(".fzf > input").value = params.get("vq") || "";
-	function func(num) {
-		if (num) {
-			params.set("sort", num);
-			window.location.search = params.toString();
-		} else {
-			if (favourite) {
-				params.delete("favourite");
-				window.location.search = params.toString();
-			} else {
-				params.set("favourite", "1");
-				window.location.search = params.toString();
-			}
-		}
-	}
-	function fzf() {
-		let query = document.querySelector(".fzf > input").value;
-		if (query) {
-			window.location.href = "/account?vq=" + query;
-		}
-	}
+  let params = new URLSearchParams(window.location.search);
+  let favourite = params.get("favourite");
+  document.querySelector(".fzf > input").value = params.get("vq") || "";
+  function func(num) {
+    if (num) {
+      params.set("sort", num);
+      window.location.search = params.toString();
+    } else {
+      if (favourite) {
+        params.delete("favourite");
+        window.location.search = params.toString();
+      } else {
+        params.set("favourite", "1");
+        window.location.search = params.toString();
+      }
+    }
+  }
+  function fzf() {
+    let query = document.querySelector(".fzf > input").value;
+    if (query) {
+      window.location.href = "/account?vq=" + query;
+    }
+  }
 </script>
