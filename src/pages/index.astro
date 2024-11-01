@@ -29,6 +29,8 @@ let recentAnime = await newEpisodes();
 
 <script is:inline>
   let tokenbkup = localStorage.getItem("vanadiumtokenrefreshbkup");
-  document.cookie = `VanadiumToken=${tokenbkup}; expires=Fri, 31 Dec 2100 23:59:59 GMT`;
-  console.log("reset token from backup");
+  if (tokenbkup != undefined || tokenbkup != null) {
+    document.cookie = `VanadiumToken=${tokenbkup}; expires=Fri, 31 Dec 2100 23:59:59 GMT`;
+    console.log("reset token from backup");
+  }
 </script>

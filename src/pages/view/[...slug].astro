@@ -14,137 +14,157 @@ data = await getAnimeEntry(title);
 image = data.Image;
 number = slug.split("episode-")[1];
 if (videos.length == 0) {
-	trytitle = data.Title;
-	trytitle = trytitle.replace(/\s+/g, "-");
-	trytitle = trytitle.toLowerCase();
-	trytitle = trytitle + "-episode-" + number;
-	videos = await getSources("/" + trytitle);
+  trytitle = data.Title;
+  trytitle = trytitle.replace(/\s+/g, "-");
+  trytitle = trytitle.toLowerCase();
+  trytitle = trytitle + "-episode-" + number;
+  videos = await getSources("/" + trytitle);
 }
 if (videos.length == 0) Astro.redirect("/notfound?from=" + slug);
 
 let token = "";
 let isUserLoggedIn = false;
 if (Astro.cookies.has("VanadiumToken")) {
-	token = Astro.cookies.get("VanadiumToken").value;
-	if (token) {
-		isUserLoggedIn = true;
-	}
+  token = Astro.cookies.get("VanadiumToken").value;
+  if (token) {
+    isUserLoggedIn = true;
+  }
 }
 if (isUserLoggedIn) {
-	let listItem = await getAnimeFromList(title, token);
-	if (listItem) await updateCurrentEpisode(title, number, token);
+  let listItem = await getAnimeFromList(title, token);
+  if (listItem) await updateCurrentEpisode(title, number, token);
 }
 ---
 
 <style>
-	a {
-		border: none;
-		border-radius: 0.25rem;
-		background-color: var(--accent);
-		color: black;
-		cursor: pointer;
-		font-size: 1.5rem;
-		padding: 0.5rem 1rem;
-		font-weight: bolder;
-		text-decoration: none;
-		text-align: center;
-		align-items: center;
-		display: flex;
-	}
-	a:hover {
-		background-color: black;
-		color: var(--accent);
-	}
-	button {
-		border: none;
-		border-radius: 0.25rem;
-		background-color: var(--accent);
-		color: black;
-		cursor: pointer;
-		font-size: 1rem;
-		padding: 0.5rem 1rem;
-		font-weight: bolder;
-	}
-	button:hover {
-		background-color: black;
-		color: var(--accent);
-	}
-	.videos,
-	.video-container,
-	.navigation {
-		display: flex;
-		gap: 10px;
-		justify-content: center;
-	}
-	.navigation {
-		display: flex;
-		gap: 5px;
-	}
+  a {
+    border: none;
+    border-radius: 0.25rem;
+    background-color: var(--accent);
+    color: black;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: bolder;
+    text-decoration: none;
+    text-align: center;
+    align-items: center;
+    display: flex;
+  }
+  a:hover {
+    background-color: black;
+    color: var(--accent);
+  }
+  button {
+    border: none;
+    border-radius: 0.25rem;
+    background-color: var(--accent);
+    color: black;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    font-weight: bolder;
+  }
+  button:hover {
+    background-color: black;
+    color: var(--accent);
+  }
+  .videos,
+  .video-container,
+  .navigation {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .navigation {
+    display: flex;
+    gap: 5px;
+  }
 
-	/* mobile */
-	@media (max-width: 600px) {
-		.videos {
-			flex-direction: column;
-			height: 50%;
-		}
-		.videos {
-			gap: 5px;
-		}
-		.navigation {
-			gap: 5px;
-		}
-	}
+  /* mobile */
+  @media (max-width: 600px) {
+    .videos {
+      flex-direction: column;
+      height: 50%;
+    }
+    .videos {
+      gap: 5px;
+    }
+    .navigation {
+      gap: 5px;
+    }
+    .video-container {
+      height: 300px;
+    }
+  }
 </style>
 
 <Layout name={data.Title}>
-	<CenteredContainer>
-		<div class="offset"></div>
-		<div class="content">
-			<div class="top-row">
-				<img src={image} style="width:90px;height:130px;" alt="Image of anime" />
-				<h1 style="color:white;">{data.Title} Episode {number}</h1>
-			</div>
-			<div class="video-container">
-				<iframe id="main-video" src={videos[0]} scrolling="no" frameborder="0" width="1000px;" height="560px;" allowfullscreen="true"></iframe>
-			</div>
-			<br />
-			<div class="navigation">
-				{
-					parseInt(number) > 1 ? (
-						<a href={"/view/" + title + "-episode-" + (parseInt(number) - 1)} class="button">
-							<ArrowLeft size="1.5rem" />
-						</a>
-					) : null
-				}
-				<a href={"/anime/" + slug.split("-episode")[0]}>View Anime</a>
-				{
-					parseInt(number) < data.Episodes ? (
-						<a href={"/view/" + title + "-episode-" + (parseInt(number) + 1)} class="button">
-							<ArrowRight size="1.5rem" />
-						</a>
-					) : null
-				}
-			</div>
-			<br />
-			<div class="videos">
-				{
-					videos.map((video, index) => (
-						<button class="videos-btn" id={video}>
-							Server {index + 1}
-						</button>
-					))
-				}
-			</div>
-		</div>
-	</CenteredContainer>
+  <CenteredContainer>
+    <div class="offset"></div>
+    <div class="content">
+      <div class="top-row">
+        <img
+          src={image}
+          style="width:90px;height:130px;"
+          alt="Image of anime"
+        />
+        <h1 style="color:white;">{data.Title} Episode {number}</h1>
+      </div>
+      <div class="video-container">
+        <iframe
+          id="main-video"
+          src={videos[0]}
+          scrolling="no"
+          frameborder="0"
+          width="1000px;"
+          height="560px;"
+          allowfullscreen="true"></iframe>
+      </div>
+      <br />
+      <div class="navigation">
+        {
+          parseInt(number) > 1 ? (
+            <a
+              href={"/view/" + title + "-episode-" + (parseInt(number) - 1)}
+              class="button"
+            >
+              <ArrowLeft size="1.5rem" />
+            </a>
+          ) : null
+        }
+        <a href={"/anime/" + slug.split("-episode")[0]}>View Anime</a>
+        {
+          parseInt(number) < data.Episodes ? (
+            <a
+              href={"/view/" + title + "-episode-" + (parseInt(number) + 1)}
+              class="button"
+            >
+              <ArrowRight size="1.5rem" />
+            </a>
+          ) : null
+        }
+      </div>
+      <br />
+      <div class="videos">
+        {
+          videos.map((video, index) => (
+            <button class="videos-btn" id={video}>
+              Server {index + 1}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </CenteredContainer>
 </Layout>
 
 <script>
-	let arr = document.getElementsByClassName("videos-btn") as any;
-	for (let i = 0; i < arr.length; i++) {
-		arr[i].addEventListener("click", function () {
-			let iframe = document.getElementById("main-video") as any;
-			iframe.src = arr[i].id;
-		});
-	}
+  let arr = document.getElementsByClassName("videos-btn") as any;
+  for (let i = 0; i < arr.length; i++) {
+    arr[i].addEventListener("click", function () {
+      let iframe = document.getElementById("main-video") as any;
+      iframe.src = arr[i].id;
+    });
+  }
 </script>

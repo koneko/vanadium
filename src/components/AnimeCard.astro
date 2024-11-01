@@ -1,14 +1,14 @@
 ---
 interface Props {
-	name: string;
-	src: string;
-	id: string;
-	hasEye: boolean;
-	episode: string;
-	accountPage: boolean;
-	currentEpisode: string;
-	status: string;
-	favourite: string;
+  name: string;
+  src: string;
+  id: string;
+  hasEye: boolean;
+  episode: string;
+  accountPage?: boolean;
+  currentEpisode?: string;
+  status?: string;
+  favourite?: string;
 }
 const { src, name, id, episode } = Astro.props;
 import EyeOpen from "@astropub/icons/EyeOpen";
@@ -16,104 +16,104 @@ import EyeClosed from "@astropub/icons/EyeClosed";
 ---
 
 <style>
-	.item {
-		width: 333px;
-		height: 468px;
-		background-color: white;
-	}
-	.item > .right {
-		position: relative;
-		top: -234px;
-		text-wrap: wrap;
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		opacity: 0;
-		z-index: 2;
-	}
-	.item:hover > .left {
-		filter: brightness(0.5);
-	}
-	.item:hover > .right {
-		opacity: 1;
-		filter: brightness(1);
-		text-shadow:
-			-1px -1px 0 var(--accent),
-			1px -1px 0 var(--accent),
-			-1px 1px 0 var(--accent),
-			1px 1px 0 var(--accent);
-	}
-	a {
-		color: white;
-		text-decoration: none;
-	}
-	a:hover {
-		text-decoration: underline;
-	}
+  .item {
+    width: 333px;
+    height: 468px;
+    background-color: white;
+  }
+  .item > .right {
+    position: relative;
+    top: -234px;
+    text-wrap: wrap;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    z-index: 2;
+  }
+  .item:hover > .left {
+    filter: brightness(0.5);
+  }
+  .item:hover > .right {
+    opacity: 1;
+    filter: brightness(1);
+    text-shadow:
+      -1px -1px 0 var(--accent),
+      1px -1px 0 var(--accent),
+      -1px 1px 0 var(--accent),
+      1px 1px 0 var(--accent);
+  }
+  a {
+    color: white;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
 
-	.eye > .closed {
-		display: block;
-	}
+  .eye > .closed {
+    display: block;
+  }
 
-	.eye > .open {
-		display: none;
-	}
+  .eye > .open {
+    display: none;
+  }
 
-	.eye:hover > .closed {
-		display: none;
-	}
+  .eye:hover > .closed {
+    display: none;
+  }
 
-	.eye:hover > .open {
-		display: block;
-	}
-	@media (max-width: 768px) {
-		.item > .right {
-			top: -50%;
-			opacity: 1;
-		}
-		.item > .left {
-			filter: brightness(0.8);
-		}
-		.eye > .closed {
-			display: none;
-		}
-		.eye > .open {
-			display: block;
-		}
-	}
+  .eye:hover > .open {
+    display: block;
+  }
+  @media (max-width: 768px) {
+    .item > .right {
+      top: -50%;
+      opacity: 1;
+    }
+    .item > .left {
+      filter: brightness(0.8);
+    }
+    .eye > .closed {
+      display: none;
+    }
+    .eye > .open {
+      display: block;
+    }
+  }
 </style>
 
 <div class="item">
-	<div class="left">
-		<img style="width:333px;height:468px;" src={src} alt={name} />
-	</div>
-	<div class="right">
-		<h3><a href={id}>{name}</a></h3>
-		{
-			Astro.props.hasEye ? (
-				<span>
-					<a href={"/anime" + episode} class="eye">
-						<EyeClosed class="closed" size="32" color="var(--accent)" />
-						<EyeOpen class="open" size="32" color="var(--accent)" />
-					</a>
-				</span>
-			) : null
-		}
-		{
-			Astro.props.accountPage ? (
-				<>
-					<span>
-						<p>Current Episode: {Astro.props.currentEpisode}</p>
-					</span>
-					<span>
-						<p>Status: {Astro.props.status}</p>
-					</span>
-					<span>
-						<p>Favourite: {Astro.props.favourite}</p>
-					</span>
-				</>
-			) : null
-		}
-	</div>
+  <div class="left">
+    <img style="width:333px;height:468px;" src={src} alt={name} />
+  </div>
+  <div class="right">
+    <h3><a href={id}>{name}</a></h3>
+    {
+      Astro.props.hasEye ? (
+        <span>
+          <a href={"/anime" + episode} class="eye">
+            <EyeClosed class="closed" size="32" color="var(--accent)" />
+            <EyeOpen class="open" size="32" color="var(--accent)" />
+          </a>
+        </span>
+      ) : null
+    }
+    {
+      Astro.props.accountPage ? (
+        <>
+          <span>
+            <p>Current Episode: {Astro.props.currentEpisode}</p>
+          </span>
+          <span>
+            <p>Status: {Astro.props.status}</p>
+          </span>
+          <span>
+            <p>Favourite: {Astro.props.favourite}</p>
+          </span>
+        </>
+      ) : null
+    }
+  </div>
 </div>
