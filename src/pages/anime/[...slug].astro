@@ -1,20 +1,21 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import CenteredContainer from "../../components/CenteredContainer.astro";
-import { getAnimeEntry } from "../../lib/db.js";
+import { getAnimeEntry, updateAnimeEntry } from "../../lib/db.js";
 import { getAnimeFromList, numberToStatus } from "../../lib/manage.js";
 
 let AnimeID = Astro.params.slug;
+await updateAnimeEntry(AnimeID);
 let Anime = await getAnimeEntry(AnimeID);
 if (!Anime) return Astro.redirect("/not-found?from=" + AnimeID);
 
 let isUserLoggedIn = false;
 let token = "";
 if (Astro.cookies.has("VanadiumToken")) {
-	token = Astro.cookies.get("VanadiumToken").value;
-	if (token) {
-		isUserLoggedIn = true;
-	}
+  token = Astro.cookies.get("VanadiumToken").value;
+  if (token) {
+    isUserLoggedIn = true;
+  }
 }
 
 let listItem = await getAnimeFromList(AnimeID, token);
@@ -22,250 +23,273 @@ let listItem = await getAnimeFromList(AnimeID, token);
 
 let episodeMapArr = [];
 for (let i = 0; i < Anime.Episodes; i++) {
-	episodeMapArr.push(i + 1);
+  episodeMapArr.push(i + 1);
 }
 ---
 
 <style is:inline>
-	.container {
-		color: white;
-	}
+  .container {
+    color: white;
+  }
 </style>
 
 <style>
-	.top {
-		display: flex;
-		gap: 20px;
-	}
-	.anime-right {
-		text-align: left;
-		width: 70%;
-	}
-	.offset {
-		height: 4rem;
-	}
-	p {
-		margin: 0.5rem 0;
-	}
-	a {
-		padding: 0.5rem;
-		padding-right: 5rem;
-		padding-left: 5rem;
-		border-radius: 5px;
-		text-decoration: none;
-		background-color: var(--accent);
-		text-align: center;
-		color: black;
-		text-decoration: none;
-		font-weight: bolder;
-	}
-	a:hover {
-		background-color: var(--accent-dark);
-		color: var(--accent);
-	}
-	.episodes {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 25px;
-		margin: 1rem 0;
-	}
-	.episodes div {
-		width: 300px;
-	}
-	button {
-		padding: 0.5rem;
-		border-radius: 5px;
-		border: none;
-		background-color: dodgerblue;
-		color: white;
-		font-weight: bolder;
-	}
-	.actions {
-		display: flex;
-		gap: 10px;
-	}
-	button {
-		cursor: pointer;
-	}
-	/* mobile */
-	@media (max-width: 768px) {
-		.top {
-			flex-direction: column;
-		}
-		.anime-right {
-			width: 100%;
-		}
-		.anime-left {
-			width: 100%;
-			text-align: center;
-			/* smaller img */
-			img {
-				width: 100%;
-			}
-		}
-		.episodes {
-			margin: 2rem 0;
-		}
-	}
+  .top {
+    display: flex;
+    gap: 20px;
+  }
+  .anime-right {
+    text-align: left;
+    width: 70%;
+  }
+  .offset {
+    height: 4rem;
+  }
+  p {
+    margin: 0.5rem 0;
+  }
+  a {
+    padding: 0.5rem;
+    padding-right: 5rem;
+    padding-left: 5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    background-color: var(--accent);
+    text-align: center;
+    color: black;
+    text-decoration: none;
+    font-weight: bolder;
+  }
+  a:hover {
+    background-color: var(--accent-dark);
+    color: var(--accent);
+  }
+  .episodes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin: 1rem 0;
+  }
+  .episodes div {
+    width: 300px;
+  }
+  button {
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    background-color: dodgerblue;
+    color: white;
+    font-weight: bolder;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+  button {
+    cursor: pointer;
+  }
+  /* mobile */
+  @media (max-width: 768px) {
+    .top {
+      flex-direction: column;
+    }
+    .anime-right {
+      width: 100%;
+    }
+    .anime-left {
+      width: 100%;
+      text-align: center;
+      /* smaller img */
+      img {
+        width: 100%;
+      }
+    }
+    .episodes {
+      margin: 2rem 0;
+    }
+  }
 </style>
 
 <Layout name={Anime.Title}>
-	<CenteredContainer>
-		<div class="offset"></div>
-		<div class="top">
-			<div class="anime-left">
-				<img src={Anime.Image} alt={Anime.Title} />
-			</div>
-			<div class="anime-right">
-				<h1>{Anime.Title}</h1>
-				{
-					Anime.Description != "N/A" && (
-						<p>
-							<b>Description: </b> {Anime.Description}
-						</p>
-					)
-				}
-				{
-					Anime.Date != "N/A" && (
-						<p>
-							<b>Date: </b> {Anime.Date}
-						</p>
-					)
-				}
-				{
-					Anime.Aliases != "N/A" && (
-						<p>
-							<b>Aliases: </b> {Anime.Aliases}
-						</p>
-					)
-				}
-				{
-					!Anime.Genres.includes("N/A") && (
-						<p>
-							<b>Genres: </b> {Anime.Genres}
-						</p>
-					)
-				}
-				{
-					listItem && (
-						<>
-							<p>
-								<b style="color: dodgerblue">Current Episode: </b> {listItem.CurrentEpisode}{" "}
-							</p>
-							<p>
-								<b style="color:dodgerblue;">Status: </b> <span id="status-span">{numberToStatus(listItem.Status)}</span>
-							</p>
-							<p>
-								<b style="color: dodgerblue">Favourite: </b> {listItem.Favourite.toString()}{" "}
-							</p>
-						</>
-					)
-				}
-				<div class="actions">
-					{
-						listItem && (
-							<button id="edit-status-btn" onclick="editStatus()">
-								Edit Status
-							</button>
-						)
-					}
-					{
-						listItem && (
-							<button id="favourite-btn" onclick="action('favourite')">
-								Favourite
-							</button>
-						)
-					}
-					{isUserLoggedIn && <div>{listItem ? <button onclick="action('removeFromList')">Remove From List</button> : <button onclick="action('addToList')">Add To List</button>}</div>}
-				</div>
-				<div class="episodes">
-					{
-						episodeMapArr.map((episode) => (
-							<div class="episode">
-								<a href={"/view/" + AnimeID + "-episode-" + episode}>Episode {episode}</a>
-							</div>
-						))
-					}
-				</div>
-			</div>
-		</div>
-	</CenteredContainer>
+  <CenteredContainer>
+    <div class="offset"></div>
+    <div class="top">
+      <div class="anime-left">
+        <img src={Anime.Image} alt={Anime.Title} />
+      </div>
+      <div class="anime-right">
+        <h1>{Anime.Title}</h1>
+        {
+          Anime.Description != "N/A" && (
+            <p>
+              <b>Description: </b> {Anime.Description}
+            </p>
+          )
+        }
+        {
+          Anime.Date != "N/A" && (
+            <p>
+              <b>Date: </b> {Anime.Date}
+            </p>
+          )
+        }
+        {
+          Anime.Aliases != "N/A" && (
+            <p>
+              <b>Aliases: </b> {Anime.Aliases}
+            </p>
+          )
+        }
+        {
+          !Anime.Genres.includes("N/A") && (
+            <p>
+              <b>Genres: </b> {Anime.Genres}
+            </p>
+          )
+        }
+        {
+          listItem && (
+            <>
+              <p>
+                <b style="color: dodgerblue">Current Episode: </b>{" "}
+                {listItem.CurrentEpisode}{" "}
+              </p>
+              <p>
+                <b style="color:dodgerblue;">Status: </b>{" "}
+                <span id="status-span">{numberToStatus(listItem.Status)}</span>
+              </p>
+              <p>
+                <b style="color: dodgerblue">Favourite: </b>{" "}
+                {listItem.Favourite.toString()}{" "}
+              </p>
+            </>
+          )
+        }
+        <div class="actions">
+          {
+            listItem && (
+              <button id="edit-status-btn" onclick="editStatus()">
+                Edit Status
+              </button>
+            )
+          }
+          {
+            listItem && (
+              <button id="favourite-btn" onclick="action('favourite')">
+                Favourite
+              </button>
+            )
+          }
+          {
+            isUserLoggedIn && (
+              <div>
+                {listItem ? (
+                  <button onclick="action('removeFromList')">
+                    Remove From List
+                  </button>
+                ) : (
+                  <button onclick="action('addToList')">Add To List</button>
+                )}
+              </div>
+            )
+          }
+        </div>
+        <div class="episodes">
+          {
+            episodeMapArr.map((episode) => (
+              <div class="episode">
+                <a href={"/view/" + AnimeID + "-episode-" + episode}>
+                  Episode {episode}
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </CenteredContainer>
 </Layout>
 
 <!-- pocetak debilnosti astro kreatora, majke mi zasto oni ovo ovak rade -->
 <script define:vars={{ token, AnimeID }} is:inline>
-	window.token = token;
-	window.AnimeID = AnimeID;
+  window.token = token;
+  window.AnimeID = AnimeID;
 </script>
 
 <script is:inline>
-	let statusSelection = false;
-	function action(action) {
-		let data = new FormData();
-		data.append("action", action);
-		data.append("AnimeID", window.AnimeID);
-		fetch("/api/action", {
-			method: "POST",
-			headers: {
-				Authorization: "Bearer " + window.token,
-			},
-			body: data,
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				window.location.reload();
-			});
-	}
-	function editStatus() {
-		if (statusSelection) {
-			let element = document.getElementById("status-span");
-			let select = document.getElementById("status-select");
-			let status = select.value;
-			element.innerHTML = status;
-			let data = new FormData();
-			data.append("action", "editStatus");
-			data.append("AnimeID", window.AnimeID);
-			data.append("status", parseInt(status));
-			fetch("/api/action", {
-				method: "POST",
-				headers: {
-					Authorization: "Bearer " + window.token,
-				},
-				body: data,
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					window.location.reload();
-				});
-		} else {
-			let element = document.getElementById("status-span");
-			// select
-			let select = document.createElement("select");
-			select.id = "status-select";
-			select.style.width = "50%";
-			select.style.padding = "0.5rem";
-			select.style.borderRadius = "5px";
-			select.style.border = "none";
-			select.style.backgroundColor = "dodgerblue";
-			select.style.color = "white";
-			select.style.fontWeight = "bolder";
-			select.style.cursor = "pointer";
+  let statusSelection = false;
+  function action(action) {
+    let data = new FormData();
+    data.append("action", action);
+    data.append("AnimeID", window.AnimeID);
+    fetch("/api/action", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + window.token,
+      },
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        window.location.reload();
+      });
+  }
+  function editStatus() {
+    if (statusSelection) {
+      let element = document.getElementById("status-span");
+      let select = document.getElementById("status-select");
+      let status = select.value;
+      element.innerHTML = status;
+      let data = new FormData();
+      data.append("action", "editStatus");
+      data.append("AnimeID", window.AnimeID);
+      data.append("status", parseInt(status));
+      fetch("/api/action", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + window.token,
+        },
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          window.location.reload();
+        });
+    } else {
+      let element = document.getElementById("status-span");
+      // select
+      let select = document.createElement("select");
+      select.id = "status-select";
+      select.style.width = "50%";
+      select.style.padding = "0.5rem";
+      select.style.borderRadius = "5px";
+      select.style.border = "none";
+      select.style.backgroundColor = "dodgerblue";
+      select.style.color = "white";
+      select.style.fontWeight = "bolder";
+      select.style.cursor = "pointer";
 
-			// options
-			let options = ["Watching", "Completed", "On Hold", "Dropped", "Plan to Watch"];
-			options.forEach((option, index) => {
-				let opt = document.createElement("option");
-				opt.value = index + 1;
-				opt.innerHTML = option;
-				select.appendChild(opt);
-			});
+      // options
+      let options = [
+        "Watching",
+        "Completed",
+        "On Hold",
+        "Dropped",
+        "Plan to Watch",
+      ];
+      options.forEach((option, index) => {
+        let opt = document.createElement("option");
+        opt.value = index + 1;
+        opt.innerHTML = option;
+        select.appendChild(opt);
+      });
 
-			select.value = 1;
-			element.innerHTML = "";
-			element.appendChild(select);
-			document.getElementById("edit-status-btn").innerHTML = "Save";
-			statusSelection = true;
-		}
-	}
+      select.value = 1;
+      element.innerHTML = "";
+      element.appendChild(select);
+      document.getElementById("edit-status-btn").innerHTML = "Save";
+      statusSelection = true;
+    }
+  }
 </script>
 <!-- boze dragi -->

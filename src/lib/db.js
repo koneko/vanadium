@@ -113,4 +113,11 @@ async function search(query) {
   return results;
 }
 
-export { db, search, searchFromDB, newEpisodes, getAnimeEntry };
+export {
+  db,
+  search,
+  searchFromDB,
+  newEpisodes,
+  getAnimeEntry,
+  updateAnimeEntry,
+};
